@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio Page</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #111;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #fff;
+            padding: 20px;
+            position: relative;
+            perspective: 1200px;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            background: rgba(22, 22, 24, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        .avatar-container {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background: #2a2a2a;
+            flex-shrink: 0;
+        }
+
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .username {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .bio {
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 16px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .location-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #C5C5C5;
+            margin-bottom: 24px;
+        }
+
+        .location-container svg {
+            width: 14px;
+            height: 14px;
+            fill: #C5C5C5;
+        }
+
+        .buttons-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transform: translateY(1.5px);
+        }
+
+        .btn-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: #C5C5C5;
+        }
+
+        .btn-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .arrow-icon {
+            width: 16px;
+            height: 16px;
+            stroke: #C5C5C5;
+            margin-left: auto;
+            transform: translateY(1px);
+        }
+
+        /* Dynamic button layout rules */
+        .buttons-grid[data-count="1"] .btn:nth-child(1) {
+            grid-column: span 2;
+        }
+        .buttons-grid[data-count="3"] .btn:nth-child(3) {
+            grid-column: span 2;
+        }
+
+        .music-container {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 4px;
+        }
+
+        .music-container iframe {
+            width: 100% !important;
+            height: 140px !important;
+            border: none !important;
+            display: block;
+            border-radius: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <!-- Avatar -->
+        <div class="avatar-container" id="avatar-block">
+            <img id="avatar-img" src="" alt="Avatar">
+        </div>
+
+        <!-- Username / Name -->
+        <div class="username" id="username-block"></div>
+
+        <!-- Bio -->
+        <div class="bio" id="bio-block"></div>
+
+        <!-- Location -->
+        <div class="location-container hidden" id="location-block">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <span id="location-text"></span>
+        </div>
+
+        <!-- Buttons Grid -->
+        <div class="buttons-grid hidden" id="buttons-grid">
+            <!-- Discord User Button -->
+            <a href="#" class="btn hidden" id="discord-user-btn" target="_blank">
+                <div class="btn-icon">
+                    <svg viewBox="0 0 256 256"><path d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z"/></svg>
+                </div>
+                <span class="btn-text" id="discord-user-text"></span>
+            </a>
+
+            <!-- Telegram User Button -->
+            <a href="#" class="btn hidden" id="tg-user-btn" target="_blank">
+                <div class="btn-icon">
+                    <svg viewBox="0 0 48 48"><path d="M41.4193 7.30899C41.4193 7.30899 45.3046 5.79399 44.9808 9.47328C44.8729 10.9883 43.9016 16.2908 43.1461 22.0262L40.5559 39.0159C40.5559 39.0159 40.3401 41.5048 38.3974 41.9377C36.4547 42.3705 33.5408 40.4227 33.0011 39.9898C32.5694 39.6652 24.9068 34.7955 22.2086 32.4148C21.4531 31.7655 20.5897 30.4669 22.3165 28.9519L33.6487 18.1305C34.9438 16.8319 36.2389 13.8019 30.8426 17.4812L15.7331 27.7616C15.7331 27.7616 14.0063 28.8437 10.7686 27.8698L3.75342 25.7055C3.75342 25.7055 1.16321 24.0823 5.58815 22.459C16.3807 17.3729 29.6555 12.1786 41.4193 7.30899Z"/></svg>
+                </div>
+                <span class="btn-text" id="tg-user-text"></span>
+            </a>
+
+            <!-- Discord Server Button -->
+            <a href="#" class="btn hidden" id="discord-server-btn" target="_blank">
+                <div class="btn-icon">
+                    <svg viewBox="0 0 256 256"><path d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z"/></svg>
+                </div>
+                <span class="btn-text" id="discord-server-name">Discord Server</span>
+                <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+        </div>
+
+        <!-- Music Widget -->
+        <div class="music-container hidden" id="music-block">
+            <div id="music-wrapper"></div>
+        </div>
+    </div>
+
+    <script>
+        const card = document.querySelector('.container');
+
+        document.addEventListener('mousemove', (e)=>{
+            const x = (window.innerWidth / 2 - e.clientX) / 45;
+            const y = (window.innerHeight / 2 - e.clientY) / 45;
+
+            card.style.transform = `
+                perspective(1200px)
+                rotateY(${-x}deg)
+                rotateX(${y}deg)
+            `;
+        });
+
+        async function fetchDiscordServerName(inviteUrl) {
+            try {
+                const match = inviteUrl.match(/(?:discord\.(?:gg|com\/invite)\/)([a-zA-Z0-9-]+)/);
+                if (!match) return 'Discord Server';
+                const code = match[1];
+                const res = await fetch(`https://discord.com/api/v9/invites/${code}?with_expiration=true`);
+                const data = await res.json();
+                if (data && data.guild && data.guild.name) {
+                    return data.guild.name;
+                }
+            } catch (e) {
+                console.error('Failed to fetch discord invite:', e);
+            }
+            return 'Discord Server';
+        }
+
+        function typeWriter(element, text, speed = 35) {
+            element.textContent = '';
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch('https://fireguild-cb569-default-rtdb.firebaseio.com/3srlz.json');
+                const data = await response.json();
+
+                if (!data) return;
+
+                function isValid(val) {
+                    return val && val !== "null" && val !== "undefined" && String(val).trim() !== "";
+                }
+
+                // Banner
+                if (isValid(data.banner)) {
+                    document.body.style.backgroundImage = `url('${data.banner}')`;
+                }
+
+                // Avatar
+                const avatarBlock = document.getElementById('avatar-block');
+                const avatarImg = document.getElementById('avatar-img');
+                if (isValid(data.avatar)) {
+                    avatarImg.src = data.avatar;
+                } else {
+                    avatarBlock.classList.add('hidden');
+                }
+
+                // Username & Page Title
+                const usernameBlock = document.getElementById('username-block');
+                const nameVal = isValid(data.nickname) ? data.nickname : (isValid(data.discordname) ? data.discordname : null);
+                if (nameVal) {
+                    usernameBlock.textContent = nameVal;
+                    document.title = nameVal;
+                } else {
+                    usernameBlock.classList.add('hidden');
+                    document.title = "Bio";
+                }
+
+                // Bio with typewriter effect
+                const bioBlock = document.getElementById('bio-block');
+                if (isValid(data.bio)) {
+                    typeWriter(bioBlock, data.bio, 35);
+                } else {
+                    bioBlock.classList.add('hidden');
+                }
+
+                // Location
+                const locationBlock = document.getElementById('location-block');
+                const locationText = document.getElementById('location-text');
+                if (isValid(data.location)) {
+                    locationText.textContent = data.location;
+                    locationBlock.classList.remove('hidden');
+                } else {
+                    locationBlock.classList.add('hidden');
+                }
+
+                // Buttons visibility & dynamic count
+                const buttonsGrid = document.getElementById('buttons-grid');
+                const discordUserBtn = document.getElementById('discord-user-btn');
+                const discordUserText = document.getElementById('discord-user-text');
+                const tgUserBtn = document.getElementById('tg-user-btn');
+                const tgUserText = document.getElementById('tg-user-text');
+                const discordServerBtn = document.getElementById('discord-server-btn');
+                const discordServerName = document.getElementById('discord-server-name');
+
+                let activeButtonsCount = 0;
+
+                if (isValid(data.discordname)) {
+                    discordUserText.textContent = `@${data.discordname.replace(/^@/, '')}`;
+                    discordUserBtn.href = `https://discord.com/users/${data.discordname}`;
+                    discordUserBtn.classList.remove('hidden');
+                    activeButtonsCount++;
+                } else {
+                    discordUserBtn.classList.add('hidden');
+                }
+
+                if (isValid(data.tgname)) {
+                    const cleanTg = data.tgname.replace(/^@/, '');
+                    tgUserText.textContent = `@${cleanTg}`;
+                    tgUserBtn.href = `https://t.me/${cleanTg}`;
+                    tgUserBtn.classList.remove('hidden');
+                    activeButtonsCount++;
+                } else {
+                    tgUserBtn.classList.add('hidden');
+                }
+
+                if (isValid(data.disinv)) {
+                    discordServerBtn.href = data.disinv;
+                    discordServerBtn.classList.remove('hidden');
+                    activeButtonsCount++;
+                    fetchDiscordServerName(data.disinv).then(serverName => {
+                        discordServerName.textContent = serverName;
+                    });
+                } else {
+                    discordServerBtn.classList.add('hidden');
+                }
+
+                if (activeButtonsCount > 0) {
+                    buttonsGrid.classList.remove('hidden');
+                    buttonsGrid.setAttribute('data-count', activeButtonsCount);
+                } else {
+                    buttonsGrid.classList.add('hidden');
+                }
+
+                // Music Widget
+                const musicBlock = document.getElementById('music-block');
+                const musicWrapper = document.getElementById('music-wrapper');
+                if (isValid(data.music)) {
+                    musicWrapper.innerHTML = data.music;
+                    const iframe = musicWrapper.querySelector('iframe');
+                    if (iframe) {
+                        iframe.style.width = '100%';
+                        iframe.style.height = '140px';
+                        iframe.style.borderRadius = '16px';
+                        iframe.setAttribute('width', '100%');
+                        iframe.setAttribute('height', '140px');
+                    }
+                    musicBlock.classList.remove('hidden');
+                } else {
+                    musicBlock.classList.add('hidden');
+                }
+
+            } catch (err) {
+                console.error('Error loading data from Firebase:', err);
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

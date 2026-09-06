@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True Crime // Dashboard</title>
+    <style>
+        :root {
+            --accent-color: #A1B6E7;
+            --bg-glass: rgba(20, 20, 24, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0b0b0e;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #fff;
+            padding: 20px;
+        }
+
+        /* Auth Screen */
+        .auth-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 36px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .auth-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            height: 42px;
+        }
+
+        /* Taller inputs */
+        .tall-input {
+            height: 48px !important;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 75px;
+            height: 75px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-color);
+            color: #0b0b0e;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .error-msg {
+            color: #ff5c5c;
+            font-size: 13px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .success-msg {
+            color: #5cff9e;
+            font-size: 13px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        /* Main Dashboard Layout */
+        .dashboard-layout {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1050px;
+            align-items: stretch;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #2a2a2a;
+            flex-shrink: 0;
+        }
+
+        .sidebar-username {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            padding: 14px 18px;
+            background: transparent;
+            border: none;
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 15px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            background: rgba(255, 92, 92, 0.08);
+            color: #ff5c5c;
+            border: 1px solid rgba(255, 92, 92, 0.15);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 92, 92, 0.18);
+            color: #ff5c5c;
+        }
+
+        /* Content Panel */
+        .content-panel {
+            flex-grow: 1;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .content-header {
+            margin-bottom: 20px;
+        }
+
+        .content-title {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .greeting span {
+            color: var(--accent-color);
+        }
+
+        /* Form Independent Columns */
+        .form-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .file-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .file-btn {
+            padding: 0 16px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .status-msg {
+            font-size: 14px;
+        }
+
+        /* Development Tab */
+        .dev-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        /* Settings / Backgrounds Tab */
+        .bg-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .bg-card {
+            height: 140px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .bg-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .bg-card.active {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(161, 182, 231, 0.4);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Section -->
+    <div class="auth-wrapper" id="auth-section">
+        <h1 class="auth-title">Вход</h1>
+        <div id="auth-error" class="error-msg hidden"></div>
+        <div id="auth-success" class="success-msg hidden"></div>
+
+        <div class="form-group">
+            <label for="auth-login">Логин</label>
+            <input type="text" id="auth-login" placeholder="Введите логин">
+        </div>
+        <div class="form-group">
+            <label for="auth-password">Пароль</label>
+            <input type="password" id="auth-password" placeholder="Введите пароль">
+        </div>
+        <button class="btn" id="auth-submit-btn" onclick="handleAuth()">Войти</button>
+    </div>
+
+    <!-- Dashboard Layout -->
+    <div class="dashboard-layout hidden" id="dashboard-layout">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-profile">
+                <img id="sidebar-avatar" src="" alt="Avatar" class="sidebar-avatar">
+                <div class="sidebar-username" id="sidebar-username">username</div>
+            </div>
+            <div class="nav-list">
+                <button class="nav-item active" onclick="switchTab('main', event)">Главная</button>
+                <button class="nav-item" onclick="switchTab('templates', event)">Шаблоны</button>
+                <button class="nav-item" onclick="switchTab('settings', event)">Настройки</button>
+                <button class="nav-item logout-btn" onclick="logout()">Выйти</button>
+            </div>
+        </div>
+
+        <!-- Content Panel -->
+        <div class="content-panel">
+            <!-- Main Tab -->
+            <div class="tab-content" id="content-main">
+                <div class="content-header">
+                    <div class="content-title">Главная</div>
+                    <div class="greeting" id="greeting-text">Добрый вечер <span>username</span></div>
+                </div>
+
+                <div class="form-container">
+                    <!-- Left Column (Independent) -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="input-nickname">Никнейм</label>
+                            <input type="text" id="input-nickname" class="tall-input" placeholder="krutoi_name" oninput="onNicknameInput(this)">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-discordname">Discord username</label>
+                            <input type="text" id="input-discordname" placeholder="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-disinv">Discord server (ссылка)</label>
+                            <input type="text" id="input-disinv" class="tall-input" placeholder="https://discord.gg/...">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-tgname">Telegram username</label>
+                            <input type="text" id="input-tgname" placeholder="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-location">Локация</label>
+                            <input type="text" id="input-location" placeholder="например, Moscow, RU">
+                        </div>
+                    </div>
+
+                    <!-- Right Column (Independent) -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="input-bio">Описание</label>
+                            <textarea id="input-bio" placeholder="Текст био..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-avatar">Аватар</label>
+                            <div class="file-row">
+                                <input type="text" id="input-avatar" class="tall-input" placeholder="https://..." oninput="onAvatarInput(this)">
+                                <button class="file-btn" onclick="document.getElementById('file-avatar').click()">Файл</button>
+                                <input type="file" id="file-avatar" accept="image/*" onchange="uploadImage('avatar', this)">
+                            </div>
+                            <div id="loading-avatar" class="loading-text hidden">Загрузка на ImgBB...</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-banner">Баннер</label>
+                            <div class="file-row">
+                                <input type="text" id="input-banner" class="tall-input" placeholder="https://..." oninput="onBannerInput(this)">
+                                <button class="file-btn" onclick="document.getElementById('file-banner').click()">Файл</button>
+                                <input type="file" id="file-banner" accept="image/*" onchange="uploadImage('banner', this)">
+                            </div>
+                            <div id="loading-banner" class="loading-text hidden">Загрузка на ImgBB...</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-music">Музыка (Виджет Я.Музыка)</label>
+                            <textarea id="input-music" placeholder="<iframe ...></iframe>"></textarea>
+                        </div>
+                        <div class="form-group" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: auto;">
+                            <div id="save-status" class="status-msg"></div>
+                            <button class="btn" style="width: auto; padding: 12px 28px;" onclick="saveBioData()">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Templates Tab -->
+            <div class="tab-content hidden" id="content-templates">
+                <div class="content-header">
+                    <div class="content-title">Шаблоны</div>
+                </div>
+                <div class="dev-view">
+                    В разработке
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-content hidden" id="content-settings">
+                <div class="content-header">
+                    <div class="content-title">Настройки</div>
+                    <div class="greeting" style="font-size: 20px;">Выбор фона дашборда</div>
+                </div>
+                <div class="bg-grid" id="bg-grid">
+                    <div class="bg-card" onclick="selectBackground('../bin/back/1.jpg', this)">
+                        <img src="../bin/back/1.jpg" alt="Background 1">
+                    </div>
+                    <div class="bg-card" onclick="selectBackground('../bin/back/2.jpg', this)">
+                        <img src="../bin/back/2.jpg" alt="Background 2">
+                    </div>
+                    <div class="bg-card" onclick="selectBackground('../bin/back/3.jpg', this)">
+                        <img src="../bin/back/3.jpg" alt="Background 3">
+                    </div>
+                    <div class="bg-card" onclick="selectBackground('../bin/back/4.gif', this)">
+                        <img src="../bin/back/4.gif" alt="Background 4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DB_URL = 'https://fireguild-cb569-default-rtdb.firebaseio.com';
+        const imgbbKeys = [
+            "3947a7dcf1e0fc078d764ba8ff02827b",
+            "6295c2bd41d13ddf9641f9f37535016b",
+            "e75b1b22ebe76469504de2b18d573a4a",
+            "b48df041740e86688a80ff159329b133"
+        ];
+
+        function hideMessages() {
+            document.getElementById('auth-error').classList.add('hidden');
+            document.getElementById('auth-success').classList.add('hidden');
+        }
+
+        async function handleAuth() {
+            hideMessages();
+            const login = document.getElementById('auth-login').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+
+            if (!login || !password) {
+                showAuthError('Заполните все поля');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${DB_URL}/dashboard/${login}.json`);
+                const userData = await res.json();
+                const encodedPass = btoa(password);
+
+                if (!userData) {
+                    showAuthError('Пользователь не найден');
+                    return;
+                }
+                if (userData.password === encodedPass) {
+                    showAuthSuccess('Успешный вход!');
+                    setTimeout(() => loginSuccess(login), 800);
+                } else {
+                    showAuthError('Неверный пароль');
+                }
+            } catch (err) {
+                console.error(err);
+                showAuthError('Ошибка соединения с базой');
+            }
+        }
+
+        function showAuthError(msg) {
+            const el = document.getElementById('auth-error');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+        }
+
+        function showAuthSuccess(msg) {
+            const el = document.getElementById('auth-success');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+        }
+
+        function loginSuccess(login) {
+            localStorage.setItem('currentUser', login);
+            checkSession();
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            document.getElementById('dashboard-layout').classList.add('hidden');
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('auth-login').value = '';
+            document.getElementById('auth-password').value = '';
+            hideMessages();
+        }
+
+        function checkSession() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('dashboard-layout').classList.remove('hidden');
+                loadBioData(user);
+                applySavedBackground();
+            }
+        }
+
+        function updateGreeting(name) {
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting = "Добрый вечер";
+            if (hour >= 4 && hour < 12) {
+                greeting = "Доброе утро";
+            } else if (hour >= 12 && hour < 17) {
+                greeting = "Добрый день";
+            } else if (hour >= 17 && hour < 24) {
+                greeting = "Добрый вечер";
+            } else {
+                greeting = "Доброй ночи";
+            }
+            const displayName = (name && name !== 'null' && name.trim() !== '') ? name : 'username';
+            document.getElementById('greeting-text').innerHTML = `${greeting} <span>${displayName}</span>`;
+        }
+
+        function onNicknameInput(el) {
+            const val = el.value.trim();
+            const displayName = val !== '' ? val : 'username';
+            document.getElementById('sidebar-username').textContent = displayName;
+            updateGreeting(displayName);
+        }
+
+        function onAvatarInput(el) {
+            const val = el.value.trim();
+            if (val !== '' && val !== 'null') {
+                document.getElementById('sidebar-avatar').src = val;
+            }
+        }
+
+        function onBannerInput(el) {
+            // Optional banner preview handler if needed
+        }
+
+        async function loadBioData(user) {
+            const targetNode = user;
+            try {
+                const res = await fetch(`${DB_URL}/${targetNode}.json`);
+                const data = await res.json();
+                if (data) {
+                    const nickname = (data.nickname && data.nickname !== 'null' && data.nickname.trim() !== '') ? data.nickname : '';
+                    document.getElementById('input-nickname').value = nickname;
+                    document.getElementById('input-bio').value = (data.bio && data.bio !== 'null') ? data.bio : '';
+                    document.getElementById('input-discordname').value = (data.discordname && data.discordname !== 'null') ? data.discordname : '';
+                    document.getElementById('input-disinv').value = (data.disinv && data.disinv !== 'null') ? data.disinv : '';
+                    document.getElementById('input-tgname').value = (data.tgname && data.tgname !== 'null') ? data.tgname : '';
+                    document.getElementById('input-location').value = (data.location && data.location !== 'null') ? data.location : '';
+                    document.getElementById('input-avatar').value = (data.avatar && data.avatar !== 'null') ? data.avatar : '';
+                    document.getElementById('input-banner').value = (data.banner && data.banner !== 'null') ? data.banner : '';
+                    document.getElementById('input-music').value = (data.music && data.music !== 'null') ? data.music : '';
+
+                    if (data.avatar && data.avatar !== 'null') {
+                        document.getElementById('sidebar-avatar').src = data.avatar;
+                    }
+
+                    const activeName = nickname !== '' ? nickname : user;
+                    document.getElementById('sidebar-username').textContent = activeName;
+                    updateGreeting(activeName);
+                } else {
+                    document.getElementById('sidebar-username').textContent = user;
+                    updateGreeting(user);
+                }
+            } catch (err) {
+                console.error('Error loading bio data:', err);
+                document.getElementById('sidebar-username').textContent = user;
+                updateGreeting(user);
+            }
+        }
+
+        async function uploadImage(fieldType, fileInput) {
+            if (!fileInput.files || fileInput.files.length === 0) return;
+            const file = fileInput.files[0];
+            const loadingEl = document.getElementById(`loading-${fieldType}`);
+            loadingEl.classList.remove('hidden');
+
+            const apiKey = imgbbKeys[Math.floor(Math.random() * imgbbKeys.length)];
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (result.success) {
+                    document.getElementById(`input-${fieldType}`).value = result.data.url;
+                    if (fieldType === 'avatar') {
+                        document.getElementById('sidebar-avatar').src = result.data.url;
+                    }
+                } else {
+                    alert('Ошибка загрузки: ' + (result.error?.message || 'Неизвестная ошибка'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Ошибка сети при загрузке изображения');
+            } finally {
+                loadingEl.classList.add('hidden');
+                fileInput.value = '';
+            }
+        }
+
+        async function saveBioData() {
+            const user = localStorage.getItem('currentUser') || '3srlz';
+            const targetNode = user;
+
+            const nicknameVal = document.getElementById('input-nickname').value.trim() || 'null';
+            const avatarVal = document.getElementById('input-avatar').value.trim() || 'null';
+
+            const payload = {
+                nickname: nicknameVal,
+                avatar: avatarVal,
+                banner: document.getElementById('input-banner').value.trim() || 'null',
+                bio: document.getElementById('input-bio').value.trim() || 'null',
+                location: document.getElementById('input-location').value.trim() || 'null',
+                discordname: document.getElementById('input-discordname').value.trim() || 'null',
+                disinv: document.getElementById('input-disinv').value.trim() || 'null',
+                tgname: document.getElementById('input-tgname').value.trim() || 'null',
+                music: document.getElementById('input-music').value.trim() || 'null'
+            };
+
+            const statusEl = document.getElementById('save-status');
+            statusEl.textContent = 'Сохранение...';
+            statusEl.style.color = '#fff';
+
+            try {
+                const res = await fetch(`${DB_URL}/${targetNode}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    statusEl.textContent = 'Успешно сохранено!';
+                    statusEl.style.color = '#5cff9e';
+                    const activeName = (nicknameVal !== 'null' && nicknameVal !== '') ? nicknameVal : user;
+                    document.getElementById('sidebar-username').textContent = activeName;
+                    if (avatarVal !== 'null') {
+                        document.getElementById('sidebar-avatar').src = avatarVal;
+                    }
+                    updateGreeting(activeName);
+                    setTimeout(() => { statusEl.textContent = ''; }, 3000);
+                } else {
+                    statusEl.textContent = 'Ошибка сохранения';
+                    statusEl.style.color = '#ff5c5c';
+                }
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = 'Ошибка сети';
+                statusEl.style.color = '#ff5c5c';
+            }
+        }
+
+        function switchTab(tabName, event) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+
+            if (tabName === 'main') {
+                document.getElementById('content-main').classList.remove('hidden');
+                event.currentTarget.classList.add('active');
+            } else if (tabName === 'templates') {
+                document.getElementById('content-templates').classList.remove('hidden');
+                event.currentTarget.classList.add('active');
+            } else if (tabName === 'settings') {
+                document.getElementById('content-settings').classList.remove('hidden');
+                event.currentTarget.classList.add('active');
+            }
+        }
+
+        function selectBackground(bgPath, cardElement) {
+            document.querySelectorAll('.bg-card').forEach(c => c.classList.remove('active'));
+            cardElement.classList.add('active');
+            document.body.style.backgroundImage = `url('${bgPath}')`;
+            localStorage.setItem('dashboard_bg', bgPath);
+        }
+
+        function applySavedBackground() {
+            const savedBg = localStorage.getItem('dashboard_bg');
+            if (savedBg) {
+                document.body.style.backgroundImage = `url('${savedBg}')`;
+                document.querySelectorAll('.bg-card').forEach(card => {
+                    const img = card.querySelector('img');
+                    if (img && img.getAttribute('src') === savedBg) {
+                        card.classList.add('active');
+                    }
+                });
+            } else {
+                const firstCard = document.querySelector('.bg-card');
+                if (firstCard) {
+                    selectBackground('../bin/back/1.jpg', firstCard);
+                }
+            }
+        }
+
+        checkSession();
+    </script>
+</body>
+</html>

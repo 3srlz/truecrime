@@ -25,7 +25,7 @@
             padding: 20px;
             position: relative;
             perspective: 1200px;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         body::before {
@@ -53,6 +53,37 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             transform-style: preserve-3d;
             will-change: transform;
+            transition: max-width 0.3s ease, width 0.3s ease;
+        }
+
+        .container.has-comments {
+            max-width: 860px !important;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 24px;
+            align-items: start;
+            padding: 32px;
+        }
+
+        .left-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .right-comments {
+            width: 100%;
+            margin-top: 0 !important;
+        }
+
+        @media (max-width: 768px) {
+            .container.has-comments {
+                max-width: 440px !important;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
         }
 
         .avatar-container {
@@ -210,7 +241,7 @@
             overflow: hidden;
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            margin-top: 4px;
+            margin-top: 12px;
         }
 
         .music-container iframe {
@@ -228,72 +259,109 @@
 </head>
 <body>
     <div class="container" id="main-container">
-        <!-- Avatar -->
-        <div class="avatar-container" id="avatar-block">
-            <img id="avatar-img" src="" alt="Avatar">
-        </div>
+        <!-- Left Content -->
+        <div class="left-content">
+            <!-- Avatar -->
+            <div class="avatar-container" id="avatar-block">
+                <img id="avatar-img" src="" alt="Avatar">
+            </div>
 
-        <!-- Username & Verified Badge -->
-        <div class="username-wrapper" id="username-wrapper">
-            <div class="username" id="username-block"></div>
-            <div class="verified-badge hidden" id="verified-badge" title="Данный пользователь верифицирован">
-                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+            <!-- Username & Verified Badge -->
+            <div class="username-wrapper" id="username-wrapper">
+                <div class="username" id="username-block"></div>
+                <div class="verified-badge hidden" id="verified-badge" title="Данный пользователь верифицирован">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                </div>
+            </div>
+
+            <!-- Quote -->
+            <div class="quote hidden" id="quote-block"></div>
+
+            <!-- Bio -->
+            <div class="bio" id="bio-block"></div>
+
+            <!-- Location -->
+            <div class="location-container hidden" id="location-block">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <span id="location-text"></span>
+            </div>
+
+            <!-- Buttons Grid -->
+            <div class="buttons-grid hidden" id="buttons-grid">
+                <!-- Discord User Button -->
+                <a href="#" class="btn hidden" id="discord-user-btn" target="_blank">
+                    <div class="btn-icon">
+                        <svg viewBox="0 0 256 256"><path d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z"/></svg>
+                    </div>
+                    <span class="btn-text" id="discord-user-text"></span>
+                </a>
+
+                <!-- Telegram User Button -->
+                <a href="#" class="btn hidden" id="tg-user-btn" target="_blank">
+                    <div class="btn-icon">
+                        <svg viewBox="0 0 48 48"><path d="M41.4193 7.30899C41.4193 7.30899 45.3046 5.79399 44.9808 9.47328C44.8729 10.9883 43.9016 16.2908 43.1461 22.0262L40.5559 39.0159C40.5559 39.0159 40.3401 41.5048 38.3974 41.9377C36.4547 42.3705 33.5408 40.4227 33.0011 39.9898C32.5694 39.6652 24.9068 34.7955 22.2086 32.4148C21.4531 31.7655 20.5897 30.4669 22.3165 28.9519L33.6487 18.1305C34.9438 16.8319 36.2389 13.8019 30.8426 17.4812L15.7331 27.7616C15.7331 27.7616 14.0063 28.8437 10.7686 27.8698L3.75342 25.7055C3.75342 25.7055 1.16321 24.0823 5.58815 22.459C16.3807 17.3729 29.6555 12.1786 41.4193 7.30899Z"/></svg>
+                    </div>
+                    <span class="btn-text" id="tg-user-text"></span>
+                </a>
+
+                <!-- Discord Server Button -->
+                <a href="#" class="btn hidden" id="discord-server-btn" target="_blank">
+                    <div class="btn-icon">
+                        <svg viewBox="0 0 256 256"><path d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z"/></svg>
+                    </div>
+                    <span class="btn-text" id="discord-server-name">Discord Server</span>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </div>
+
+            <!-- Clock Widget -->
+            <div class="music-container hidden" id="clock-block" style="padding: 16px 20px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.6); margin-bottom: 8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span id="clock-label">Екатеринбург GMT+5</span>
+                </div>
+                <div style="font-size: 2.2rem; font-weight: 800; color: #fff; letter-spacing: -1px; line-height: 1.1; margin-bottom: 6px;">
+                    <span id="clock-hms">15:59</span><span id="clock-sec" style="color: rgba(255, 255, 255, 0.4);">:48</span>
+                </div>
+                <div id="clock-date" style="font-size: 13px; color: rgba(255, 255, 255, 0.6);">27 сентября</div>
+            </div>
+
+            <!-- Music Widget -->
+            <div class="music-container hidden" id="music-block">
+                <div id="music-wrapper"></div>
+            </div>
+
+            <!-- Custom HTML Widget -->
+            <div class="music-container hidden" id="custom-html-block">
+                <div id="custom-html-wrapper"></div>
             </div>
         </div>
 
-        <!-- Quote -->
-        <div class="quote hidden" id="quote-block"></div>
+        <!-- Right Comments Column (Transparent Background) -->
+        <div class="right-comments music-container hidden" id="comments-block" style="padding: 14px 16px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 13px; font-weight: 600; color: #fff;" id="comments-title">Комментарии 0</span>
+                <span style="font-size: 11px; color: rgba(255, 255, 255, 0.5);" id="comments-rating">0 оценок</span>
+            </div>
 
-        <!-- Bio -->
-        <div class="bio" id="bio-block"></div>
+            <!-- Comments List -->
+            <div id="comments-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; max-height: 280px; overflow-y: auto;"></div>
 
-        <!-- Location -->
-        <div class="location-container hidden" id="location-block">
-            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-            <span id="location-text"></span>
-        </div>
-
-        <!-- Buttons Grid -->
-        <div class="buttons-grid hidden" id="buttons-grid">
-            <!-- Discord User Button -->
-            <a href="#" class="btn hidden" id="discord-user-btn" target="_blank">
-                <div class="btn-icon">
-                    <svg viewBox="0 0 256 256"><path d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z"/></svg>
+            <!-- Add Comment Form -->
+            <div id="comment-form-wrapper" style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 10px;">
+                <input type="text" id="comment-author" placeholder="Ваше имя или анонимно..." style="width: 100%; padding: 8px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-size: 12px;">
+                <textarea id="comment-text" placeholder="Написать комментарий..." style="width: 100%; padding: 8px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-size: 12px; resize: none; height: 50px;"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="comment-cooldown" style="font-size: 11px; color: #ff5c5c;"></span>
+                    <button onclick="postComment()" style="padding: 6px 14px; background: var(--accent-color, #A1B6E7); color: #0b0b0e; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">Отправить</button>
                 </div>
-                <span class="btn-text" id="discord-user-text"></span>
-            </a>
-
-            <!-- Telegram User Button -->
-            <a href="#" class="btn hidden" id="tg-user-btn" target="_blank">
-                <div class="btn-icon">
-                    <svg viewBox="0 0 48 48"><path d="M41.4193 7.30899C41.4193 7.30899 45.3046 5.79399 44.9808 9.47328C44.8729 10.9883 43.9016 16.2908 43.1461 22.0262L40.5559 39.0159C40.5559 39.0159 40.3401 41.5048 38.3974 41.9377C36.4547 42.3705 33.5408 40.4227 33.0011 39.9898C32.5694 39.6652 24.9068 34.7955 22.2086 32.4148C21.4531 31.7655 20.5897 30.4669 22.3165 28.9519L33.6487 18.1305C34.9438 16.8319 36.2389 13.8019 30.8426 17.4812L15.7331 27.7616C15.7331 27.7616 14.0063 28.8437 10.7686 27.8698L3.75342 25.7055C3.75342 25.7055 1.16321 24.0823 5.58815 22.459C16.3807 17.3729 29.6555 12.1786 41.4193 7.30899Z"/></svg>
-                </div>
-                <span class="btn-text" id="tg-user-text"></span>
-            </a>
-
-            <!-- Discord Server Button -->
-            <a href="#" class="btn hidden" id="discord-server-btn" target="_blank">
-                <div class="btn-icon">
-                    <svg viewBox="0 0 256 256"><path d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z"/></svg>
-                </div>
-                <span class="btn-text" id="discord-server-name">Discord Server</span>
-                <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
-        </div>
-
-        <!-- Music Widget -->
-        <div class="music-container hidden" id="music-block">
-            <div id="music-wrapper"></div>
-        </div>
-
-        <!-- Custom HTML Widget -->
-        <div class="music-container hidden" id="custom-html-block">
-            <div id="custom-html-wrapper"></div>
+            </div>
         </div>
     </div>
 
     <script>
         const card = document.querySelector('.container');
+        const CURRENT_USER_PAGE = '3srlz';
 
         document.addEventListener('mousemove', (e)=>{
             const x = (window.innerWidth / 2 - e.clientX) / 45;
@@ -317,9 +385,7 @@
                 if (data && data.guild && data.guild.name) {
                     return data.guild.name;
                 }
-            } catch (e) {
-                // Ignore network errors or 404s
-            }
+            } catch (e) {}
             return 'Discord Server';
         }
 
@@ -334,6 +400,128 @@
                 }
             }
             type();
+        }
+
+        function initClock(offsetStr, label) {
+            const clockBlock = document.getElementById('clock-block');
+            if (clockBlock) {
+                clockBlock.classList.remove('hidden');
+            }
+
+            function tick() {
+                const now = new Date();
+                const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+                const offsetHours = parseFloat(offsetStr) || 0;
+                const targetTime = new Date(utcTime + (3600000 * offsetHours));
+
+                const hours = String(targetTime.getHours()).padStart(2, '0');
+                const minutes = String(targetTime.getMinutes()).padStart(2, '0');
+                const seconds = String(targetTime.getSeconds()).padStart(2, '0');
+
+                document.getElementById('clock-hms').textContent = `${hours}:${minutes}`;
+                document.getElementById('clock-sec').textContent = `:${seconds}`;
+
+                const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+                const day = targetTime.getDate();
+                const month = months[targetTime.getMonth()];
+                document.getElementById('clock-date').textContent = `${day} ${month}`;
+
+                const sign = offsetHours >= 0 ? `+${offsetHours}` : `${offsetHours}`;
+                document.getElementById('clock-label').textContent = `${label || 'Время'} GMT${sign}`;
+            }
+            tick();
+            setInterval(tick, 1000);
+        }
+
+        async function loadComments() {
+            const container = document.getElementById('main-container');
+            const commentsBlock = document.getElementById('comments-block');
+            if (commentsBlock && container) {
+                container.classList.add('has-comments');
+                commentsBlock.classList.remove('hidden');
+            }
+            try {
+                const res = await fetch(`https://fireguild-cb569-default-rtdb.firebaseio.com/${CURRENT_USER_PAGE}/comments.json`);
+                const commentsObj = await res.json() || {};
+                const listEl = document.getElementById('comments-list');
+                listEl.innerHTML = '';
+
+                const keys = Object.keys(commentsObj);
+                document.getElementById('comments-title').textContent = `Комментарии ${keys.length}`;
+                document.getElementById('comments-rating').textContent = `${keys.length} оценка`;
+
+                if (keys.length === 0) {
+                    listEl.innerHTML = '<div style="font-size: 12px; color: rgba(255,255,255,0.4); text-align: center; padding: 6px;">Пока нет комментариев</div>';
+                    return;
+                }
+
+                keys.forEach(key => {
+                    const c = commentsObj[key];
+                    const item = document.createElement('div');
+                    item.style.cssText = 'display: flex; gap: 8px; align-items: flex-start; background: rgba(255,255,255,0.02); padding: 8px 10px; border-radius: 8px;';
+                    item.innerHTML = `
+                        <div style="width: 26px; height: 26px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 11px; color: #fff; flex-shrink: 0;">${c.author ? c.author.charAt(0).toUpperCase() : '?'}</div>
+                        <div style="flex-grow: 1; overflow: hidden;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                                <span style="font-size: 12px; font-weight: 600; color: #fff;">${c.author || 'Аноним'}</span>
+                                <span style="font-size: 10px; color: rgba(255,255,255,0.4);">${c.date || ''}</span>
+                            </div>
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.8); word-break: break-word;">${c.text || ''}</div>
+                        </div>
+                    `;
+                    listEl.appendChild(item);
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function postComment() {
+            const author = document.getElementById('comment-author').value.trim();
+            const text = document.getElementById('comment-text').value.trim();
+            const cooldownEl = document.getElementById('comment-cooldown');
+            cooldownEl.textContent = '';
+
+            if (!author || !text) {
+                cooldownEl.textContent = 'Заполните имя и текст';
+                return;
+            }
+
+            // 15 hours cooldown = 15 * 60 * 60 * 1000 = 54000000 ms
+            const lastTime = localStorage.getItem(`last_comment_${CURRENT_USER_PAGE}`);
+            const now = Date.now();
+            const CD_TIME = 15 * 60 * 60 * 1000;
+
+            if (lastTime && (now - lastTime < CD_TIME)) {
+                const leftMs = CD_TIME - (now - lastTime);
+                const leftHrs = Math.ceil(leftMs / (1000 * 60 * 60));
+                cooldownEl.textContent = `КД 15ч! Осталось ${leftHrs} ч.`;
+                return;
+            }
+
+            const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+            const d = new Date();
+            const dateStr = `${d.getDate()} ${months[d.getMonth()]}`;
+
+            const newComment = { author, text, date: dateStr };
+
+            try {
+                const res = await fetch(`https://fireguild-cb569-default-rtdb.firebaseio.com/${CURRENT_USER_PAGE}/comments.json`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newComment)
+                });
+                if (res.ok) {
+                    localStorage.setItem(`last_comment_${CURRENT_USER_PAGE}`, now);
+                    document.getElementById('comment-author').value = '';
+                    document.getElementById('comment-text').value = '';
+                    cooldownEl.style.color = '#5cff9e';
+                    cooldownEl.textContent = 'Успешно!';
+                    loadComments();
+                }
+            } catch(e) {
+                cooldownEl.textContent = 'Ошибка';
+            }
         }
 
         async function loadData() {
@@ -437,8 +625,9 @@
                     tgUserBtn.classList.add('hidden');
                 }
 
-                if (isValid(data.disinv)) {
+                if (data.disinv) {
                     discordServerBtn.href = data.disinv;
+                    discordServerBtn.classList.min ? discordServerBtn.classList.remove('hidden') : null;
                     discordServerBtn.classList.remove('hidden');
                     activeButtonsCount++;
                     fetchDiscordServerName(data.disinv).then(serverName => {
@@ -453,6 +642,15 @@
                     buttonsGrid.setAttribute('data-count', activeButtonsCount);
                 } else {
                     buttonsGrid.classList.add('hidden');
+                }
+
+                // Clock Widget (Dynamic from DB)
+                if (data.clock_enabled === true || data.clock_enabled === "true") {
+                    const tzOffset = isValid(data.timezone_offset) ? data.timezone_offset : '+5';
+                    const tzLabel = isValid(data.timezone_label) ? data.timezone_label : 'Екатеринбург';
+                    initClock(tzOffset, tzLabel);
+                } else {
+                    document.getElementById('clock-block').classList.add('hidden');
                 }
 
                 // Music Widget
@@ -481,6 +679,16 @@
                     customHtmlBlock.classList.remove('hidden');
                 } else {
                     customHtmlBlock.classList.add('hidden');
+                }
+
+                // Comments Section (Dynamic from DB)
+                const containerEl = document.getElementById('main-container');
+                const commentsBlockEl = document.getElementById('comments-block');
+                if (data.comments_enabled === true || data.comments_enabled === "true") {
+                    loadComments();
+                } else {
+                    if (commentsBlockEl) commentsBlockEl.classList.add('hidden');
+                    if (containerEl) containerEl.classList.remove('has-comments');
                 }
 
             } catch (err) {

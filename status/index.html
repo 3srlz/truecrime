@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status // True Crime</title>
+    <style>
+        :root {
+            --accent-color: #A1B6E7;
+            --success-color: #4ade80;
+            --warning-color: #facc15;
+            --danger-color: #f87171;
+            --bg-glass: rgba(20, 20, 24, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0b0b0e;
+            color: #f4f4f5;
+            padding: 20px;
+            background-image: radial-gradient(circle at 50% 0%, #1f1f2e 0%, #0b0b0e 70%);
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 620px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 36px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 20px;
+        }
+
+        .brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .brand span {
+            color: var(--accent-color);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .status-badge.warning {
+            background: rgba(250, 204, 21, 0.1);
+            border: 1px solid rgba(250, 204, 21, 0.2);
+            color: var(--warning-color);
+        }
+
+        .status-badge.danger {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            color: var(--danger-color);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: currentColor;
+            border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .uptime-banner {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .uptime-title {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .uptime-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .services-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .service-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .service-info {
+            flex-grow: 1;
+        }
+
+        .service-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .service-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .service-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .service-status.success { color: var(--success-color); }
+        .service-status.warning { color: var(--warning-color); }
+        .service-status.danger { color: var(--danger-color); }
+
+        .service-dot {
+            width: 6px;
+            height: 6px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .last-check {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="brand">True Crime <span>// Status</span></div>
+            <div class="status-badge" id="overall-badge">
+                <div class="status-dot"></div>
+                <span id="overall-text">Проверка систем...</span>
+            </div>
+        </div>
+
+        <div class="uptime-banner">
+            <div>
+                <div class="uptime-title">System Uptime</div>
+                <div class="uptime-value" id="uptime-percentage">99.99%</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="uptime-title">Active Time</div>
+                <div class="uptime-value" id="uptime-timer">Loading...</div>
+            </div>
+        </div>
+
+        <div class="services-list">
+            <!-- Database & Auth API -->
+            <div class="service-item">
+                <div class="service-info">
+                    <div class="service-name">Database & Auth API</div>
+                    <div class="service-desc">Firebase Realtime Database connection</div>
+                </div>
+                <div class="service-status success" id="status-db">
+                    <div class="service-dot"></div>
+                    <span id="text-db">Проверка...</span>
+                </div>
+            </div>
+
+            <!-- Dashboard -->
+            <div class="service-item">
+                <div class="service-info">
+                    <div class="service-name">Dashboard</div>
+                    <div class="service-desc">User admin panel & management</div>
+                </div>
+                <div class="service-status success" id="status-dash">
+                    <div class="service-dot"></div>
+                    <span id="text-dash">Проверка...</span>
+                </div>
+            </div>
+
+            <!-- Pages -->
+            <div class="service-item">
+                <div class="service-info">
+                    <div class="service-name">Pages</div>
+                    <div class="service-desc">Bio profiles hosting & rendering</div>
+                </div>
+                <div class="service-status success" id="status-pages">
+                    <div class="service-dot"></div>
+                    <span id="text-pages">Проверка...</span>
+                </div>
+            </div>
+
+            <!-- Image Upload API -->
+            <div class="service-item">
+                <div class="service-info">
+                    <div class="service-name">Image Upload API</div>
+                    <div class="service-desc">ImgBB media storage gateway</div>
+                </div>
+                <div class="service-status success" id="status-img">
+                    <div class="service-dot"></div>
+                    <span id="text-img">Проверка...</span>
+                </div>
+            </div>
+
+            <!-- Discord Gateway -->
+            <div class="service-item">
+                <div class="service-info">
+                    <div class="service-name">Discord Gateway</div>
+                    <div class="service-desc">Invite parsing & server metadata API</div>
+                </div>
+                <div class="service-status success" id="status-discord">
+                    <div class="service-dot"></div>
+                    <span id="text-discord">Проверка...</span>
+                </div>
+            </div>
+
+            <!-- Music API -->
+            <div class="service-item">
+                <div class="service-info">
+                    <div class="service-name">Music API</div>
+                    <div class="service-desc">Yandex Music widget gateway</div>
+                </div>
+                <div class="service-status success" id="status-music">
+                    <div class="service-dot"></div>
+                    <span id="text-music">Проверка...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-actions">
+            <a href="../dashboard/" class="back-btn">← В дашборд</a>
+            <div class="last-check" id="last-check">Обновление...</div>
+        </div>
+    </div>
+
+    <script>
+        const DB_URL = 'https://fireguild-cb569-default-rtdb.firebaseio.com';
+
+        function setServiceState(id, stateCode) {
+            const el = document.getElementById(`status-${id}`);
+            const textEl = document.getElementById(`text-${id}`);
+            el.className = 'service-status';
+
+            if (stateCode === 1) {
+                el.classList.add('success');
+                textEl.textContent = 'Работает';
+                return 1;
+            } else if (stateCode === 2) {
+                el.classList.add('warning');
+                textEl.textContent = 'На обновлении';
+                return 2;
+            } else {
+                el.classList.add('danger');
+                textEl.textContent = 'Не работает';
+                return 3;
+            }
+        }
+
+        async function checkSystems() {
+            let allOperational = true;
+            let hasWarning = false;
+
+            // 1. Database & Auth API (Firebase fetch .json)
+            let dbState = 3;
+            try {
+                const res = await fetch(`${DB_URL}/.json`, { method: 'GET' });
+                dbState = res.ok ? 1 : 3;
+            } catch(e) {
+                dbState = 3;
+            }
+            const s1 = setServiceState('db', dbState);
+            if (s1 === 3) allOperational = false;
+            if (s1 === 2) hasWarning = true;
+
+            // Fetch Firebase /status node for dash & pages
+            let firebaseStatus = {};
+            try {
+                const res = await fetch(`${DB_URL}/status.json`);
+                firebaseStatus = await res.json() || {};
+            } catch(e) {}
+
+            // 2. Dashboard
+            const dashVal = firebaseStatus.dash !== undefined ? Number(firebaseStatus.dash) : 1;
+            const s2 = setServiceState('dash', dashVal);
+            if (s2 === 3) allOperational = false;
+            if (s2 === 2) hasWarning = true;
+
+            // 3. Pages
+            const pagesVal = firebaseStatus.pages !== undefined ? Number(firebaseStatus.pages) : 1;
+            const s3 = setServiceState('pages', pagesVal);
+            if (s3 === 3) allOperational = false;
+            if (s3 === 2) hasWarning = true;
+
+            // 4. Image Upload API (ImgBB request)
+            let imgState = 1;
+            try {
+                await fetch('https://api.imgbb.com/', { method: 'HEAD', mode: 'no-cors' });
+                imgState = 1;
+            } catch(e) {
+                imgState = 3;
+            }
+            const s4 = setServiceState('img', imgState);
+            if (s4 === 3) allOperational = false;
+
+            // 5. Discord Gateway
+            let discordState = 1;
+            try {
+                await fetch('https://discord.com/api/v9/gateway', { method: 'GET', mode: 'no-cors' });
+                discordState = 1;
+            } catch(e) {
+                discordState = 3;
+            }
+            const s5 = setServiceState('discord', discordState);
+            if (s5 === 3) allOperational = false;
+
+            // 6. Music API (Yandex Music)
+            let musicState = 1;
+            try {
+                await fetch('https://music.yandex.ru', { method: 'HEAD', mode: 'no-cors' });
+                musicState = 1;
+            } catch(e) {
+                musicState = 3;
+            }
+            const s6 = setServiceState('music', musicState);
+            if (s6 === 3) allOperational = false;
+
+            // Overall Badge update
+            const badge = document.getElementById('overall-badge');
+            const badgeText = document.getElementById('overall-text');
+            badge.className = 'status-badge';
+
+            if (allOperational && !hasWarning) {
+                badgeText.textContent = 'All Systems Operational';
+            } else if (hasWarning) {
+                badge.classList.add('warning');
+                badgeText.textContent = 'Partial Maintenance';
+            } else {
+                badge.classList.add('danger');
+                badgeText.textContent = 'System Outage';
+            }
+
+            const nowTime = new Date().toLocaleTimeString();
+            document.getElementById('last-check').textContent = `Проверено в ${nowTime}`;
+        }
+
+        // Simulate uptime starting from Sep 1, 2026
+        const startDate = new Date('2026-09-01T00:00:00').getTime();
+        function updateUptime() {
+            const now = new Date().getTime();
+            const diff = now - startDate;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            document.getElementById('uptime-timer').textContent = `${days}д ${hours % 24}ч ${minutes % 60}м ${seconds % 60}с`;
+        }
+
+        checkSystems();
+        updateUptime();
+        setInterval(checkSystems, 10000); // Check every 10s
+        setInterval(updateUptime, 1000);
+    </script>
+</body>
+</html>

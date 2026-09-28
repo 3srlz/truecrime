@@ -55,7 +55,7 @@
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 0;
         }
 
         label {
@@ -63,7 +63,7 @@
             font-size: 13px;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         input[type="text"],
@@ -174,6 +174,11 @@
             flex-shrink: 0;
         }
 
+        .sidebar-profile-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
         .sidebar-username {
             font-size: 15px;
             font-weight: 600;
@@ -181,6 +186,37 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            margin-bottom: 6px;
+        }
+
+        .sidebar-profile-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .profile-action-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            border-radius: 8px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .profile-action-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .profile-action-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
         }
 
         .nav-list {
@@ -382,12 +418,25 @@
         <div class="sidebar">
             <div class="sidebar-profile">
                 <img id="sidebar-avatar" src="" alt="Avatar" class="sidebar-avatar">
-                <div class="sidebar-username" id="sidebar-username">username</div>
+                <div class="sidebar-profile-info">
+                    <div class="sidebar-username" id="sidebar-username">username</div>
+                    <div class="sidebar-profile-actions">
+                        <!-- Open Page SVG Button -->
+                        <button class="profile-action-btn" onclick="openMyPage()" title="Открыть мою страницу">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </button>
+                        <!-- QR Code SVG Button -->
+                        <button class="profile-action-btn" onclick="openQrModal()" title="QR-код профиля">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="nav-list">
                 <button class="nav-item active" onclick="switchTab('main', event)">Главная</button>
                 <button class="nav-item" onclick="switchTab('templates', event)">Шаблоны</button>
                 <button class="nav-item" onclick="switchTab('settings', event)">Настройки</button>
+                <button class="nav-item" onclick="openStatusPage()">Статус системы</button>
                 <button class="nav-item logout-btn" onclick="logout()">Выйти</button>
             </div>
         </div>
@@ -409,6 +458,10 @@
                             <input type="text" id="input-nickname" class="tall-input" placeholder="krutoi_name" oninput="onNicknameInput(this)">
                         </div>
                         <div class="form-group">
+                            <label for="input-qoute">Цитата (Quote)</label>
+                            <input type="text" id="input-qoute" class="tall-input" placeholder="Ваша цитата...">
+                        </div>
+                        <div class="form-group">
                             <label for="input-discordname">Discord username</label>
                             <input type="text" id="input-discordname" placeholder="username">
                         </div>
@@ -420,9 +473,21 @@
                             <label for="input-tgname">Telegram username</label>
                             <input type="text" id="input-tgname" placeholder="username">
                         </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+                            <input type="checkbox" id="input-clock-enabled" style="width: 20px; height: 20px; accent-color: var(--accent-color); cursor: pointer;">
+                            <label for="input-clock-enabled" style="margin-bottom: 0; cursor: pointer;">Включить виджет времени</label>
+                        </div>
                         <div class="form-group">
-                            <label for="input-location">Локация</label>
-                            <input type="text" id="input-location" placeholder="например, Moscow, RU">
+                            <label for="input-tz-label">Название / Город времени</label>
+                            <input type="text" id="input-tz-label" placeholder="Екатеринбург">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-tz-offset">Смещение GMT (например, +5 или -3)</label>
+                            <input type="text" id="input-tz-offset" placeholder="+5">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+                            <input type="checkbox" id="input-comments-enabled" style="width: 20px; height: 20px; accent-color: var(--accent-color); cursor: pointer;" checked>
+                            <label for="input-comments-enabled" style="margin-bottom: 0; cursor: pointer;">Включить комментарии</label>
                         </div>
                     </div>
 
@@ -453,6 +518,14 @@
                         <div class="form-group">
                             <label for="input-music">Музыка (Виджет Я.Музыка)</label>
                             <textarea id="input-music" placeholder="<iframe ...></iframe>"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-custom-html">Кастомный HTML виджет</label>
+                            <textarea id="input-custom-html" placeholder="<div>Ваш HTML код...</div>"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-location">Локация</label>
+                            <input type="text" id="input-location" placeholder="например, Moscow, RU">
                         </div>
                         <div class="form-group" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: auto;">
                             <div id="save-status" class="status-msg"></div>
@@ -493,6 +566,18 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qr-modal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center;">
+        <div style="background: rgba(22, 22, 24, 0.95); border: 1px solid var(--border-color); border-radius: 20px; padding: 28px; text-align: center; max-width: 300px; width: 100%;">
+            <h3 style="margin-bottom: 16px; font-size: 18px; color: #fff;">QR-код вашей страницы</h3>
+            <div id="qr-container" style="background: #fff; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 16px;">
+                <img id="qr-img" src="" alt="QR Code" style="width: 160px; height: 160px; display: block;">
+            </div>
+            <br>
+            <button class="btn" style="padding: 10px 20px; font-size: 14px; width: 100%;" onclick="closeQrModal()">Закрыть</button>
         </div>
     </div>
 
@@ -608,8 +693,30 @@
             }
         }
 
-        function onBannerInput(el) {
-            // Optional banner preview handler if needed
+        function onBannerInput(el) {}
+
+        function openMyPage() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                window.open(`../${user}/index.html`, '_blank');
+            }
+        }
+
+        function openStatusPage() {
+            window.open('../status/', '_blank');
+        }
+
+        function openQrModal() {
+            const user = localStorage.getItem('currentUser');
+            if (!user) return;
+            const pageUrl = `${window.location.origin}/${user}/index.html`;
+            const qrImg = document.getElementById('qr-img');
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pageUrl)}`;
+            document.getElementById('qr-modal').classList.remove('hidden');
+        }
+
+        function closeQrModal() {
+            document.getElementById('qr-modal').classList.add('hidden');
         }
 
         async function loadBioData(user) {
@@ -620,6 +727,7 @@
                 if (data) {
                     const nickname = (data.nickname && data.nickname !== 'null' && data.nickname.trim() !== '') ? data.nickname : '';
                     document.getElementById('input-nickname').value = nickname;
+                    document.getElementById('input-qoute').value = (data.qoute && data.qoute !== 'null') ? data.qoute : '';
                     document.getElementById('input-bio').value = (data.bio && data.bio !== 'null') ? data.bio : '';
                     document.getElementById('input-discordname').value = (data.discordname && data.discordname !== 'null') ? data.discordname : '';
                     document.getElementById('input-disinv').value = (data.disinv && data.disinv !== 'null') ? data.disinv : '';
@@ -628,6 +736,12 @@
                     document.getElementById('input-avatar').value = (data.avatar && data.avatar !== 'null') ? data.avatar : '';
                     document.getElementById('input-banner').value = (data.banner && data.banner !== 'null') ? data.banner : '';
                     document.getElementById('input-music').value = (data.music && data.music !== 'null') ? data.music : '';
+                    document.getElementById('input-custom-html').value = (data.custom_html && data.custom_html !== 'null') ? data.custom_html : '';
+
+                    document.getElementById('input-clock-enabled').checked = !!data.clock_enabled;
+                    document.getElementById('input-tz-label').value = (data.timezone_label && data.timezone_label !== 'null') ? data.timezone_label : 'Екатеринбург';
+                    document.getElementById('input-tz-offset').value = (data.timezone_offset && data.timezone_offset !== 'null') ? data.timezone_offset : '+5';
+                    document.getElementById('input-comments-enabled').checked = data.comments_enabled !== false && data.comments_enabled !== "false";
 
                     if (data.avatar && data.avatar !== 'null') {
                         document.getElementById('sidebar-avatar').src = data.avatar;
@@ -641,7 +755,7 @@
                     updateGreeting(user);
                 }
             } catch (err) {
-                console.error('Error loading bio data:', err);
+                console.error('Error loading data from Firebase:', err);
                 document.getElementById('sidebar-username').textContent = user;
                 updateGreeting(user);
             }
@@ -687,8 +801,19 @@
             const nicknameVal = document.getElementById('input-nickname').value.trim() || 'null';
             const avatarVal = document.getElementById('input-avatar').value.trim() || 'null';
 
+            let currentCheck = false;
+            try {
+                const existingRes = await fetch(`${DB_URL}/${targetNode}.json`);
+                const existingData = await existingRes.json();
+                if (existingData && existingData.check !== undefined) {
+                    currentCheck = existingData.check;
+                }
+            } catch(e) {}
+
             const payload = {
                 nickname: nicknameVal,
+                qoute: document.getElementById('input-qoute').value.trim() || 'null',
+                check: currentCheck,
                 avatar: avatarVal,
                 banner: document.getElementById('input-banner').value.trim() || 'null',
                 bio: document.getElementById('input-bio').value.trim() || 'null',
@@ -696,7 +821,12 @@
                 discordname: document.getElementById('input-discordname').value.trim() || 'null',
                 disinv: document.getElementById('input-disinv').value.trim() || 'null',
                 tgname: document.getElementById('input-tgname').value.trim() || 'null',
-                music: document.getElementById('input-music').value.trim() || 'null'
+                music: document.getElementById('input-music').value.trim() || 'null',
+                custom_html: document.getElementById('input-custom-html').value.trim() || 'null',
+                clock_enabled: document.getElementById('input-clock-enabled').checked,
+                timezone_label: document.getElementById('input-tz-label').value.trim() || 'Екатеринбург',
+                timezone_offset: document.getElementById('input-tz-offset').value.trim() || '+5',
+                comments_enabled: document.getElementById('input-comments-enabled').checked
             };
 
             const statusEl = document.getElementById('save-status');
@@ -773,6 +903,7 @@
         }
 
         checkSession();
+        applySavedBackground();
     </script>
 </body>
 </html>

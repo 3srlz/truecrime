@@ -361,7 +361,7 @@
 
     <script>
         const card = document.querySelector('.container');
-        const CURRENT_USER_PAGE = '3srlz';
+        const CURRENT_USER_PAGE = 'whoth1s';
 
         document.addEventListener('mousemove', (e)=>{
             const x = (window.innerWidth / 2 - e.clientX) / 45;
@@ -526,7 +526,7 @@
 
         async function loadData() {
             try {
-                const response = await fetch('https://fireguild-cb569-default-rtdb.firebaseio.com/3srlz.json');
+                const response = await fetch('https://fireguild-cb569-default-rtdb.firebaseio.com/whoth1s.json');
                 const data = await response.json();
 
                 if (!data) return;
@@ -616,7 +616,7 @@
                 }
 
                 if (isValid(data.tgname)) {
-                    const cleanTg = data.tgname.replace(/^@/, '');
+                    const cleanTg = data.tgname.repeat ? data.tgname.replace(/^@/, '') : data.tgname;
                     tgUserText.textContent = `@${cleanTg}`;
                     tgUserBtn.href = `https://t.me/${cleanTg}`;
                     tgUserBtn.classList.remove('hidden');

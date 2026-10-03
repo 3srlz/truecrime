@@ -595,6 +595,13 @@
             document.getElementById('auth-success').classList.add('hidden');
         }
 
+        async function hashPassword(password) {
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         async function handleAuth() {
             hideMessages();
             const login = document.getElementById('auth-login').value.trim();
@@ -608,13 +615,17 @@
             try {
                 const res = await fetch(`${DB_URL}/dashboard/${login}.json`);
                 const userData = await res.json();
-                const encodedPass = btoa(password);
+
+                // Временно поддерживаем и Base64 (старые) и SHA-256 (новые)
+                const hashedPass = await hashPassword(password);
+                const base64Pass = btoa(password);
 
                 if (!userData) {
                     showAuthError('Пользователь не найден');
                     return;
                 }
-                if (userData.password === encodedPass) {
+
+                if (userData.password === hashedPass || userData.password === base64Pass) {
                     showAuthSuccess('Успешный вход!');
                     setTimeout(() => loginSuccess(login), 800);
                 } else {

@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True Crime // Dashboard</title>
+    <style>
+        :root {
+            --accent-color: #E07B39;
+            --bg-glass: rgba(16, 14, 18, 0.88);
+            --border-color: rgba(255, 255, 255, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0b0b0e;
+            background-image: url('https://i.pinimg.com/1200x/cc/2c/4a/cc2c4a8710bbab5892b3ccdd64719332.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #fff;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Затемняющая вуаль для читаемости */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 6, 12, 0.65);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Паутина по углам */
+        .decor {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .cobweb {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            opacity: 0.35;
+        }
+        .cobweb.tl { top: 0; left: 0; }
+        .cobweb.tr { top: 0; right: 0; transform: scaleX(-1); }
+        .cobweb.bl { bottom: 0; left: 0; transform: scaleY(-1); }
+        .cobweb.br { bottom: 0; right: 0; transform: scale(-1, -1); }
+
+        /* Auth Screen */
+        .auth-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 36px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .auth-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.55);
+            margin-bottom: 4px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+            height: 42px;
+        }
+
+        .tall-input {
+            height: 48px !important;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 75px;
+            height: 75px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-color);
+            color: #14100c;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn:hover {
+            opacity: 0.88;
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .success-msg {
+            color: #6bffa0;
+            font-size: 13px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        /* Main Dashboard Layout */
+        .dashboard-layout {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1050px;
+            align-items: stretch;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #2a2a2a;
+            flex-shrink: 0;
+        }
+
+        .sidebar-profile-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .sidebar-username {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-bottom: 6px;
+        }
+
+        .sidebar-profile-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .profile-action-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: none;
+            border-radius: 8px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .profile-action-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .profile-action-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            padding: 14px 18px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 15px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            background: rgba(255, 92, 92, 0.06);
+            color: #ff7b7b;
+            border: 1px solid rgba(255, 92, 92, 0.12);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 92, 92, 0.14);
+            color: #ff7b7b;
+        }
+
+        /* Content Panel */
+        .content-panel {
+            flex-grow: 1;
+            background: var(--bg-glass);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .content-header {
+            margin-bottom: 20px;
+        }
+
+        .content-title {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .greeting span {
+            color: var(--accent-color);
+        }
+
+        /* Form Independent Columns */
+        .form-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .file-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .file-btn {
+            padding: 0 16px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-btn:hover {
+            background: rgba(255, 255, 255, 0.13);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .status-msg {
+            font-size: 14px;
+        }
+
+        /* Settings Tab */
+        .current-bg-card {
+            height: 200px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 460px;
+        }
+
+        .current-bg-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #decor-preview-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: none;
+            object-fit: contain;
+            z-index: 2;
+        }
+
+        #decor-preview-frame[data-decor="Cat!"] {
+            width: 150% !important;
+            height: 150% !important;
+        }
+
+        #decor-preview-frame[data-decor="Вороны"] {
+            width: 181% !important;
+            height: 181% !important;
+        }
+
+        #decor-preview-frame[data-decor="Кресты"] {
+            width: 186% !important;
+            height: 186% !important;
+        }
+
+        #decor-preview-frame[data-decor="Venom"] {
+            width: 142% !important;
+            height: 142% !important;
+            top: 41% !important;
+        }
+
+        #decor-preview-frame[data-decor="Venom"] {
+            width: 142%;
+            height: 142%;
+            top: 41%;
+        }
+
+        .loading-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        /* Templates Grid */
+        .templates-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .templates-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .create-tpl-btn {
+            padding: 10px 18px;
+            background: var(--accent-color);
+            color: #14100c;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+
+        .create-tpl-btn:hover {
+            opacity: 0.88;
+        }
+
+        .create-tpl-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .daily-counter {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 18px;
+            margin-top: 16px;
+        }
+
+        .template-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .template-card:hover {
+            border-color: var(--accent-color);
+        }
+
+        .template-preview {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: #1a1a1e;
+            display: block;
+        }
+
+        .template-preview-placeholder {
+            width: 100%;
+            height: 140px;
+            background: #1a1a1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 13px;
+        }
+
+        .template-info {
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .template-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #2a2a2a;
+            flex-shrink: 0;
+        }
+
+        .template-meta {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .template-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-bottom: 2px;
+        }
+
+        .template-author {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .template-apply-btn {
+            width: 100%;
+            padding: 10px;
+            background: rgba(224, 123, 57, 0.1);
+            color: var(--accent-color);
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .template-apply-btn:hover {
+            background: rgba(224, 123, 57, 0.2);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: rgba(22, 20, 24, 0.97);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 26px;
+            width: 100%;
+            max-width: 460px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-title {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .modal-subtitle {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 18px;
+        }
+
+        .modal-field {
+            margin-bottom: 14px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        .modal-error {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .modal-success {
+            color: #6bffa0;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .img-preview-box {
+            margin-top: 6px;
+            border-radius: 10px;
+            overflow: hidden;
+            max-height: 90px;
+            display: none;
+        }
+
+        .img-preview-box img {
+            width: 100%;
+            max-height: 90px;
+            object-fit: cover;
+            display: block;
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Паутина по углам -->
+    <div class="decor" aria-hidden="true">
+        <svg class="cobweb tl" viewBox="0 0 200 200" fill="none" stroke="rgba(230,230,245,0.4)" stroke-width="1.2">
+            <path d="M0 0 L200 0 M0 0 L0 200 M0 0 L140 140"/>
+            <path d="M40 0 Q38 38 0 40" />
+            <path d="M80 0 Q76 76 0 80" />
+            <path d="M120 0 Q114 114 0 120" />
+            <path d="M160 0 Q152 152 0 160" />
+        </svg>
+        <svg class="cobweb tr" viewBox="0 0 200 200" fill="none" stroke="rgba(230,230,245,0.4)" stroke-width="1.2">
+            <path d="M0 0 L200 0 M0 0 L0 200 M0 0 L140 140"/>
+            <path d="M40 0 Q38 38 0 40" />
+            <path d="M80 0 Q76 76 0 80" />
+            <path d="M120 0 Q114 114 0 120" />
+            <path d="M160 0 Q152 152 0 160" />
+        </svg>
+        <svg class="cobweb bl" viewBox="0 0 200 200" fill="none" stroke="rgba(230,230,245,0.3)" stroke-width="1.2">
+            <path d="M0 0 L200 0 M0 0 L0 200 M0 0 L140 140"/>
+            <path d="M40 0 Q38 38 0 40" />
+            <path d="M80 0 Q76 76 0 80" />
+            <path d="M120 0 Q114 114 0 120" />
+        </svg>
+        <svg class="cobweb br" viewBox="0 0 200 200" fill="none" stroke="rgba(230,230,245,0.3)" stroke-width="1.2">
+            <path d="M0 0 L200 0 M0 0 L0 200 M0 0 L140 140"/>
+            <path d="M40 0 Q38 38 0 40" />
+            <path d="M80 0 Q76 76 0 80" />
+            <path d="M120 0 Q114 114 0 120" />
+        </svg>
+    </div>
+
+    <!-- Auth Section -->
+    <div class="auth-wrapper" id="auth-section">
+        <h1 class="auth-title">Вход</h1>
+        <div id="auth-error" class="error-msg hidden"></div>
+        <div id="auth-success" class="success-msg hidden"></div>
+
+        <div class="form-group">
+            <label for="auth-login">Логин</label>
+            <input type="text" id="auth-login" placeholder="Введите логин">
+        </div>
+        <div class="form-group">
+            <label for="auth-password">Пароль</label>
+            <input type="password" id="auth-password" placeholder="Введите пароль">
+        </div>
+        <button class="btn" id="auth-submit-btn" onclick="handleAuth()">Войти</button>
+    </div>
+
+    <!-- Dashboard Layout -->
+    <div class="dashboard-layout hidden" id="dashboard-layout">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-profile">
+                <img id="sidebar-avatar" src="" alt="Avatar" class="sidebar-avatar">
+                <div class="sidebar-profile-info">
+                    <div class="sidebar-username" id="sidebar-username">username</div>
+                    <div class="sidebar-profile-actions">
+                        <button class="profile-action-btn" onclick="openMyPage()" title="Открыть мою страницу">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </button>
+                        <button class="profile-action-btn" onclick="openQrModal()" title="QR-код профиля">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-list">
+                <button class="nav-item active" onclick="switchTab('main', event)">Главная</button>
+                <button class="nav-item" onclick="switchTab('templates', event)">Шаблоны</button>
+                <button class="nav-item" onclick="switchTab('settings', event)">Настройки</button>
+                <button class="nav-item" onclick="openShopPage()">Магазин</button>
+                <button class="nav-item" onclick="openEventPage()">Ивент</button>
+                <button class="nav-item logout-btn" onclick="logout()">Выйти</button>
+            </div>
+        </div>
+
+        <!-- Content Panel -->
+        <div class="content-panel">
+            <!-- Main Tab -->
+            <div class="tab-content" id="content-main">
+                <div class="content-header">
+                    <div class="content-title">Главная</div>
+                    <div class="greeting" id="greeting-text">Добрый вечер <span>username</span></div>
+                </div>
+
+                <div class="form-container">
+                    <!-- Left Column -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="input-nickname">Никнейм</label>
+                            <input type="text" id="input-nickname" class="tall-input" placeholder="krutoi_name" oninput="onNicknameInput(this)">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-qoute">Цитата (Quote)</label>
+                            <input type="text" id="input-qoute" class="tall-input" placeholder="Ваша цитата...">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-discordname">Discord username</label>
+                            <input type="text" id="input-discordname" placeholder="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-disinv">Discord server (ссылка)</label>
+                            <input type="text" id="input-disinv" class="tall-input" placeholder="https://discord.gg/...">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-tgname">Telegram username</label>
+                            <input type="text" id="input-tgname" placeholder="username">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+                            <input type="checkbox" id="input-clock-enabled" style="width: 20px; height: 20px; cursor: pointer;">
+                            <label for="input-clock-enabled" style="margin-bottom: 0; cursor: pointer;">Включить виджет времени</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-tz-label">Название / Город времени</label>
+                            <input type="text" id="input-tz-label" placeholder="Екатеринбург">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-tz-offset">Смещение GMT (например, +5 или -3)</label>
+                            <input type="text" id="input-tz-offset" placeholder="+5">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+                            <input type="checkbox" id="input-comments-enabled" style="width: 20px; height: 20px; cursor: pointer;" checked>
+                            <label for="input-comments-enabled" style="margin-bottom: 0; cursor: pointer;">Включить комментарии</label>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="input-bio">Описание</label>
+                            <textarea id="input-bio" placeholder="Текст био..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-avatar">Аватар</label>
+                            <div class="file-row">
+                                <input type="text" id="input-avatar" class="tall-input" placeholder="https://..." oninput="onAvatarInput(this)">
+                                <button class="file-btn" onclick="document.getElementById('file-avatar').click()">Файл</button>
+                                <input type="file" id="file-avatar" accept="image/*" onchange="uploadImage('avatar', this)">
+                            </div>
+                            <div id="loading-avatar" class="loading-text hidden">Загрузка на ImgBB...</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-decor-select">Украшение аватарки (Декор)</label>
+                            <select id="input-decor-select" class="tall-input" onchange="updateDecorPreview()" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 10px; color: #fff; width: 100%; cursor: pointer;">
+                                <option value="" style="background: #161618; color: #fff;">Без декора</option>
+                                <option value="Cat!" style="background: #161618; color: #fff;">Cat!</option>
+                                <option value="Вороны" style="background: #161618; color: #fff;">Вороны</option>
+                                <option value="Кресты" style="background: #161618; color: #fff;">Кресты</option>
+                                <option value="Venom" style="background: #161618; color: #fff;">Venom</option>
+                            </select>
+                            <div id="decor-preview-wrapper" style="margin-top: 10px; display: flex; align-items: center; gap: 14px; background: rgba(0, 0, 0, 0.25); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                                <div style="position: relative; width: 56px; height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                                    <div style="width: 56px; height: 56px; border-radius: 50%; overflow: hidden; background: #2a2a2a; border: 2px solid rgba(255,255,255,0.15);">
+                                        <img id="decor-preview-avatar" src="" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar Preview">
+                                    </div>
+                                    <img id="decor-preview-frame" src="" alt="Frame Preview">
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <span style="font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 500;">Предпросмотр рамки</span>
+                                    <span id="decor-status-text" style="font-size: 13px; color: #fff; font-weight: 600;">Без декора</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-banner">Баннер</label>
+                            <div class="file-row">
+                                <input type="text" id="input-banner" class="tall-input" placeholder="https://..." oninput="onBannerInput(this)">
+                                <button class="file-btn" onclick="document.getElementById('file-banner').click()">Файл</button>
+                                <input type="file" id="file-banner" accept="image/*" onchange="uploadImage('banner', this)">
+                            </div>
+                            <div id="loading-banner" class="loading-text hidden">Загрузка на ImgBB...</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-music">Музыка (Виджет Я.Музыка)</label>
+                            <textarea id="input-music" placeholder="<iframe ...></iframe>"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-custom-html">Кастомный HTML виджет</label>
+                            <textarea id="input-custom-html" placeholder="<div>Ваш HTML код...</div>"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-location">Локация</label>
+                            <input type="text" id="input-location" placeholder="например, Moscow, RU">
+                        </div>
+                        <div class="form-group" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: auto;">
+                            <div id="save-status" class="status-msg"></div>
+                            <button class="btn" style="width: auto; padding: 12px 28px;" onclick="saveBioData()">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Templates Tab -->
+            <div class="tab-content hidden" id="content-templates">
+                <div class="templates-header">
+                    <div class="content-header" style="margin-bottom: 0;">
+                        <div class="content-title">Шаблоны</div>
+                        <div class="greeting" style="font-size: 20px;">Выберите шаблон для своей страницы</div>
+                    </div>
+                    <div class="templates-actions">
+                        <button class="create-tpl-btn" id="create-tpl-btn" onclick="openCreateTemplateModal()">+ Создать шаблон</button>
+                        <div class="daily-counter" id="daily-counter"></div>
+                    </div>
+                </div>
+                <div id="templates-loading" class="loading-text" style="text-align:center; padding: 20px;">Загрузка шаблонов...</div>
+                <div id="templates-error" class="error-msg hidden" style="text-align:center; padding: 20px;"></div>
+                <div class="templates-grid" id="templates-grid"></div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-content hidden" id="content-settings">
+                <div class="content-header">
+                    <div class="content-title">Настройки</div>
+                    <div class="greeting" style="font-size: 20px;">Фон дашборда</div>
+                </div>
+                <p style="font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 14px;">Фон зафиксирован и не может быть изменён.</p>
+                <div class="current-bg-card">
+                    <img src="https://i.pinimg.com/1200x/cc/2c/4a/cc2c4a8710bbab5892b3ccdd64719332.jpg" alt="Текущий фон">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qr-modal" class="hidden modal-overlay">
+        <div class="modal-box" style="max-width: 300px; text-align: center;">
+            <h3 style="margin-bottom: 16px; font-size: 18px; color: #fff;">QR-код вашей страницы</h3>
+            <div id="qr-container" style="background: #fff; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 16px;">
+                <img id="qr-img" src="" alt="QR Code" style="width: 160px; height: 160px; display: block;">
+            </div>
+            <br>
+            <button class="btn" style="padding: 10px 20px; font-size: 14px; width: 100%;" onclick="closeQrModal()">Закрыть</button>
+        </div>
+    </div>
+
+    <!-- Create Template Modal -->
+    <div id="create-tpl-modal" class="hidden modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title">Создать шаблон</div>
+            <div class="modal-subtitle">Автор: <span id="tpl-author-name">—</span></div>
+
+            <div id="create-tpl-error" class="modal-error hidden"></div>
+            <div id="create-tpl-success" class="modal-success hidden"></div>
+
+            <div class="modal-field">
+                <label for="tpl-name">Название шаблона *</label>
+                <input type="text" id="tpl-name" class="tall-input" placeholder="Например: Dark Gothic">
+            </div>
+
+            <div class="modal-field">
+                <label for="tpl-avatar">Аватар (URL или загрузка)</label>
+                <div class="file-row">
+                    <input type="text" id="tpl-avatar" class="tall-input" placeholder="https://..." oninput="previewTplImage('avatar', this.value)">
+                    <button class="file-btn" onclick="document.getElementById('tpl-file-avatar').click()">Файл</button>
+                    <input type="file" id="tpl-file-avatar" accept="image/*" onchange="uploadTemplateImage('avatar', this)">
+                </div>
+                <div id="tpl-loading-avatar" class="loading-text hidden">Загрузка на ImgBB...</div>
+                <div class="img-preview-box" id="tpl-preview-avatar"><img src="" alt=""></div>
+            </div>
+
+            <div class="modal-field">
+                <label for="tpl-banner">Баннер (URL или загрузка)</label>
+                <div class="file-row">
+                    <input type="text" id="tpl-banner" class="tall-input" placeholder="https://..." oninput="previewTplImage('banner', this.value)">
+                    <button class="file-btn" onclick="document.getElementById('tpl-file-banner').click()">Файл</button>
+                    <input type="file" id="tpl-file-banner" accept="image/*" onchange="uploadTemplateImage('banner', this)">
+                </div>
+                <div id="tpl-loading-banner" class="loading-text hidden">Загрузка на ImgBB...</div>
+                <div class="img-preview-box" id="tpl-preview-banner"><img src="" alt=""></div>
+            </div>
+
+            <div class="modal-field">
+                <label for="tpl-preview">Превью (URL или загрузка)</label>
+                <div class="file-row">
+                    <input type="text" id="tpl-preview" class="tall-input" placeholder="https://..." oninput="previewTplImage('preview', this.value)">
+                    <button class="file-btn" onclick="document.getElementById('tpl-file-preview').click()">Файл</button>
+                    <input type="file" id="tpl-file-preview" accept="image/*" onchange="uploadTemplateImage('preview', this)">
+                </div>
+                <div id="tpl-loading-preview" class="loading-text hidden">Загрузка на ImgBB...</div>
+                <div class="img-preview-box" id="tpl-preview-preview"><img src="" alt=""></div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeCreateTemplateModal()">Отмена</button>
+                <button class="btn" id="tpl-submit-btn" onclick="submitTemplate()">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DB_URL = 'https://fireguild-cb569-default-rtdb.firebaseio.com';
+        const imgbbKeys = [
+            "3947a7dcf1e0fc078d764ba8ff02827b",
+            "6295c2bd41d13ddf9641f9f37535016b",
+            "e75b1b22ebe76469504de2b18d573a4a",
+            "b48df041740e86688a80ff159329b133"
+        ];
+
+        const DAILY_TEMPLATE_LIMIT = 6;
+
+        function hideMessages() {
+            document.getElementById('auth-error').classList.add('hidden');
+            document.getElementById('auth-success').classList.add('hidden');
+        }
+
+        async function hashPassword(password) {
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function handleAuth() {
+            hideMessages();
+            const login = document.getElementById('auth-login').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+
+            if (!login || !password) {
+                showAuthError('Заполните все поля');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${DB_URL}/dashboard/${login}.json`);
+                const userData = await res.json();
+
+                const hashedPass = await hashPassword(password);
+                const base64Pass = btoa(password);
+
+                if (!userData) {
+                    showAuthError('Пользователь не найден');
+                    return;
+                }
+
+                if (userData.password === hashedPass || userData.password === base64Pass) {
+                    showAuthSuccess('Успешный вход!');
+                    setTimeout(() => loginSuccess(login), 800);
+                } else {
+                    showAuthError('Неверный пароль');
+                }
+            } catch (err) {
+                console.error(err);
+                showAuthError('Ошибка соединения с базой');
+            }
+        }
+
+        function showAuthError(msg) {
+            const el = document.getElementById('auth-error');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+        }
+
+        function showAuthSuccess(msg) {
+            const el = document.getElementById('auth-success');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+        }
+
+        function loginSuccess(login) {
+            localStorage.setItem('currentUser', login);
+            checkSession();
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            document.getElementById('dashboard-layout').classList.add('hidden');
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('auth-login').value = '';
+            document.getElementById('auth-password').value = '';
+            hideMessages();
+        }
+
+        function checkSession() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('dashboard-layout').classList.remove('hidden');
+                loadBioData(user);
+            }
+        }
+
+        function updateGreeting(name) {
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting = "Добрый вечер";
+            if (hour >= 4 && hour < 12) {
+                greeting = "Доброе утро";
+            } else if (hour >= 12 && hour < 17) {
+                greeting = "Добрый день";
+            } else if (hour >= 17 && hour < 24) {
+                greeting = "Добрый вечер";
+            } else {
+                greeting = "Доброй ночи";
+            }
+            const displayName = (name && name !== 'null' && name.trim() !== '') ? name : 'username';
+            document.getElementById('greeting-text').innerHTML = `${greeting} <span>${displayName}</span>`;
+        }
+
+        const DECOR_MAP = {
+            'Cat!': '../bin/decor/cat-Photoroom.png',
+            'Вороны': '../bin/decor/voroni-Photoroom.png',
+            'Кресты': '../bin/decor/krest-Photoroom.png',
+            'Venom': '../bin/decor/venom-Photoroom.png'
+        };
+
+        let currentLoadedDecors = {
+            "Cat!": false,
+            "Вороны": false,
+            "Кресты": false,
+            "Venom": false,
+            "current": ""
+        };
+
+        function populateDecorSelector(decorsObj, userAvatar) {
+            const decorSelect = document.getElementById('input-decor-select');
+            if (!decorSelect) return;
+
+            decorSelect.innerHTML = '<option value="" style="background: #161618; color: #fff;">Без декора</option>';
+
+            const decorList = ['Cat!', 'Вороны', 'Кресты', 'Venom'];
+            decorList.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.style.background = '#161618';
+                opt.style.color = '#fff';
+                const isOwned = decorsObj && (decorsObj[name] === true || decorsObj[name] === "true");
+                if (isOwned) {
+                    opt.textContent = name;
+                    opt.disabled = false;
+                } else {
+                    opt.textContent = `${name} (🔒 Не куплено)`;
+                    opt.disabled = true;
+                }
+                decorSelect.appendChild(opt);
+            });
+
+            const current = (decorsObj && decorsObj.current) ? decorsObj.current : "";
+            if (current && decorsObj && (decorsObj[current] === true || decorsObj[current] === "true")) {
+                decorSelect.value = current;
+            } else {
+                decorSelect.value = "";
+            }
+
+            updateDecorPreview(userAvatar);
+        }
+
+        function updateDecorPreview(userAvatar) {
+            const decorSelect = document.getElementById('input-decor-select');
+            const previewAvatar = document.getElementById('decor-preview-avatar');
+            const previewFrame = document.getElementById('decor-preview-frame');
+            const statusText = document.getElementById('decor-status-text');
+
+            if (!decorSelect) return;
+
+            const avatarUrl = userAvatar || document.getElementById('input-avatar')?.value || 'https://via.placeholder.com/96';
+            if (previewAvatar) previewAvatar.src = avatarUrl;
+
+            const val = decorSelect.value;
+            if (val && DECOR_MAP[val]) {
+                if (previewFrame) {
+                    previewFrame.src = DECOR_MAP[val];
+                    previewFrame.setAttribute('data-decor', val);
+                    previewFrame.style.display = 'block';
+                }
+                if (statusText) statusText.textContent = `Выбрано: ${val}`;
+            } else {
+                if (previewFrame) {
+                    previewFrame.style.display = 'none';
+                    previewFrame.removeAttribute('data-decor');
+                    previewFrame.src = '';
+                }
+                if (statusText) statusText.textContent = 'Без декора';
+            }
+        }
+
+        function onNicknameInput(el) {
+            const val = el.value.trim();
+            const displayName = val !== '' ? val : 'username';
+            document.getElementById('sidebar-username').textContent = displayName;
+            updateGreeting(displayName);
+        }
+
+        function onAvatarInput(el) {
+            const val = el.value.trim();
+            if (val !== '' && val !== 'null') {
+                document.getElementById('sidebar-avatar').src = val;
+            }
+            updateDecorPreview(val);
+        }
+
+        function onBannerInput(el) {}
+
+        function openMyPage() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                window.open(`../${user}/index.html`, '_blank');
+            }
+        }
+
+        function openShopPage() {
+            window.open('../shop/index.html', '_blank');
+        }
+
+        function openEventPage() {
+            window.open('../halloween/index.html', '_blank');
+        }
+
+        function openQrModal() {
+            const user = localStorage.getItem('currentUser');
+            if (!user) return;
+            const pageUrl = `${window.location.origin}/${user}/index.html`;
+            const qrImg = document.getElementById('qr-img');
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pageUrl)}`;
+            document.getElementById('qr-modal').classList.remove('hidden');
+        }
+
+        function closeQrModal() {
+            document.getElementById('qr-modal').classList.add('hidden');
+        }
+
+        async function loadBioData(user) {
+            const targetNode = user;
+            try {
+                const res = await fetch(`${DB_URL}/${targetNode}.json`);
+                const data = await res.json();
+                if (data) {
+                    const nickname = (data.nickname && data.nickname !== 'null' && data.nickname.trim() !== '') ? data.nickname : '';
+                    document.getElementById('input-nickname').value = nickname;
+                    document.getElementById('input-qoute').value = (data.qoute && data.qoute !== 'null') ? data.qoute : '';
+                    document.getElementById('input-bio').value = (data.bio && data.bio !== 'null') ? data.bio : '';
+                    document.getElementById('input-discordname').value = (data.discordname && data.discordname !== 'null') ? data.discordname : '';
+                    document.getElementById('input-disinv').value = (data.disinv && data.disinv !== 'null') ? data.disinv : '';
+                    document.getElementById('input-tgname').value = (data.tgname && data.tgname !== 'null') ? data.tgname : '';
+                    document.getElementById('input-location').value = (data.location && data.location !== 'null') ? data.location : '';
+                    document.getElementById('input-avatar').value = (data.avatar && data.avatar !== 'null') ? data.avatar : '';
+                    document.getElementById('input-banner').value = (data.banner && data.banner !== 'null') ? data.banner : '';
+                    document.getElementById('input-music').value = (data.music && data.music !== 'null') ? data.music : '';
+                    document.getElementById('input-custom-html').value = (data.custom_html && data.custom_html !== 'null') ? data.custom_html : '';
+
+                    document.getElementById('input-clock-enabled').checked = !!data.clock_enabled;
+                    document.getElementById('input-tz-label').value = (data.timezone_label && data.timezone_label !== 'null') ? data.timezone_label : 'Екатеринбург';
+                    document.getElementById('input-tz-offset').value = (data.timezone_offset && data.timezone_offset !== 'null') ? data.timezone_offset : '+5';
+                    document.getElementById('input-comments-enabled').checked = data.comments_enabled !== false && data.comments_enabled !== "false";
+
+                    currentLoadedDecors = {
+                        "Cat!": false,
+                        "Вороны": false,
+                        "Кресты": false,
+                        "Venom": false,
+                        "current": ""
+                    };
+                    if (data.decors && typeof data.decors === 'object') {
+                        currentLoadedDecors = { ...currentLoadedDecors, ...data.decors };
+                    }
+                    populateDecorSelector(currentLoadedDecors, (data.avatar && data.avatar !== 'null') ? data.avatar : null);
+
+                    if (data.avatar && data.avatar !== 'null') {
+                        document.getElementById('sidebar-avatar').src = data.avatar;
+                    }
+
+                    const activeName = nickname !== '' ? nickname : user;
+                    document.getElementById('sidebar-username').textContent = activeName;
+                    updateGreeting(activeName);
+                } else {
+                    currentLoadedDecors = {
+                        "Cat!": false,
+                        "Вороны": false,
+                        "Кресты": false,
+                        "Venom": false,
+                        "current": ""
+                    };
+                    populateDecorSelector(currentLoadedDecors, null);
+                    document.getElementById('sidebar-username').textContent = user;
+                    updateGreeting(user);
+                }
+            } catch (err) {
+                console.error('Error loading data from Firebase:', err);
+                currentLoadedDecors = {
+                    "Cat!": false,
+                    "Вороны": false,
+                    "Кресты": false,
+                    "Venom": false,
+                    "current": ""
+                };
+                populateDecorSelector(currentLoadedDecors, null);
+                document.getElementById('sidebar-username').textContent = user;
+                updateGreeting(user);
+            }
+        }
+
+        async function uploadImage(fieldType, fileInput) {
+            if (!fileInput.files || fileInput.files.length === 0) return;
+            const file = fileInput.files[0];
+            const loadingEl = document.getElementById(`loading-${fieldType}`);
+            loadingEl.classList.remove('hidden');
+
+            const apiKey = imgbbKeys[Math.floor(Math.random() * imgbbKeys.length)];
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (result.success) {
+                    document.getElementById(`input-${fieldType}`).value = result.data.url;
+                    if (fieldType === 'avatar') {
+                        document.getElementById('sidebar-avatar').src = result.data.url;
+                        updateDecorPreview(result.data.url);
+                    }
+                } else {
+                    alert('Ошибка загрузки: ' + (result.error?.message || 'Неизвестная ошибка'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Ошибка сети при загрузке изображения');
+            } finally {
+                loadingEl.classList.add('hidden');
+                fileInput.value = '';
+            }
+        }
+
+        async function saveBioData() {
+            const user = localStorage.getItem('currentUser') || '3srlz';
+            const targetNode = user;
+
+            const nicknameVal = document.getElementById('input-nickname').value.trim() || 'null';
+            const avatarVal = document.getElementById('input-avatar').value.trim() || 'null';
+
+            let currentCheck = false;
+            let currentComments = null;
+            let currentBadges = null;
+            let currentBalance = null;
+
+            try {
+                const existingRes = await fetch(`${DB_URL}/${targetNode}.json`);
+                const existingData = await existingRes.json();
+                if (existingData) {
+                    if (existingData.check !== undefined) currentCheck = existingData.check;
+                    if (existingData.comments !== undefined) currentComments = existingData.comments;
+                    if (existingData.badges !== undefined) currentBadges = existingData.badges;
+                    if (existingData.balance !== undefined) currentBalance = existingData.balance;
+                    if (existingData.decors && typeof existingData.decors === 'object') {
+                        currentLoadedDecors = { ...currentLoadedDecors, ...existingData.decors };
+                    }
+                }
+            } catch(e) {}
+
+            const selectedDecor = document.getElementById('input-decor-select')?.value || '';
+            currentLoadedDecors.current = selectedDecor;
+
+            const payload = {
+                nickname: nicknameVal,
+                qoute: document.getElementById('input-qoute').value.trim() || 'null',
+                check: currentCheck,
+                avatar: avatarVal,
+                banner: document.getElementById('input-banner').value.trim() || 'null',
+                bio: document.getElementById('input-bio').value.trim() || 'null',
+                location: document.getElementById('input-location').value.trim() || 'null',
+                discordname: document.getElementById('input-discordname').value.trim() || 'null',
+                disinv: document.getElementById('input-disinv').value.trim() || 'null',
+                tgname: document.getElementById('input-tgname').value.trim() || 'null',
+                music: document.getElementById('input-music').value.trim() || 'null',
+                custom_html: document.getElementById('input-custom-html').value.trim() || 'null',
+                clock_enabled: document.getElementById('input-clock-enabled').checked,
+                timezone_label: document.getElementById('input-tz-label').value.trim() || 'Екатеринбург',
+                timezone_offset: document.getElementById('input-tz-offset').value.trim() || '+5',
+                comments_enabled: document.getElementById('input-comments-enabled').checked,
+                decors: currentLoadedDecors
+            };
+
+            if (currentComments !== null) payload.comments = currentComments;
+            if (currentBadges !== null) payload.badges = currentBadges;
+            if (currentBalance !== null) payload.balance = currentBalance;
+
+            const statusEl = document.getElementById('save-status');
+            statusEl.textContent = 'Сохранение...';
+            statusEl.style.color = '#fff';
+
+            try {
+                const res = await fetch(`${DB_URL}/${targetNode}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    statusEl.textContent = 'Успешно сохранено!';
+                    statusEl.style.color = '#6bffa0';
+                    const activeName = (nicknameVal !== 'null' && nicknameVal !== '') ? nicknameVal : user;
+                    document.getElementById('sidebar-username').textContent = activeName;
+                    if (avatarVal !== 'null') {
+                        document.getElementById('sidebar-avatar').src = avatarVal;
+                    }
+                    updateGreeting(activeName);
+                    setTimeout(() => { statusEl.textContent = ''; }, 3000);
+                } else {
+                    statusEl.textContent = 'Ошибка сохранения';
+                    statusEl.style.color = '#ff6b6b';
+                }
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = 'Ошибка сети';
+                statusEl.style.color = '#ff6b6b';
+            }
+        }
+
+        function switchTab(tabName, event) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+
+            if (tabName === 'main') {
+                document.getElementById('content-main').classList.remove('hidden');
+                event.currentTarget.classList.add('active');
+            } else if (tabName === 'templates') {
+                document.getElementById('content-templates').classList.remove('hidden');
+                event.currentTarget.classList.add('active');
+                loadTemplates();
+                refreshDailyCounter();
+            } else if (tabName === 'settings') {
+                document.getElementById('content-settings').classList.remove('hidden');
+                event.currentTarget.classList.add('active');
+            }
+        }
+
+        // ===== TEMPLATES =====
+        async function loadTemplates() {
+            const grid = document.getElementById('templates-grid');
+            const loading = document.getElementById('templates-loading');
+            const errorEl = document.getElementById('templates-error');
+
+            grid.innerHTML = '';
+            loading.classList.remove('hidden');
+            errorEl.classList.add('hidden');
+
+            try {
+                const res = await fetch(`${DB_URL}/templates.json`);
+                const data = await res.json();
+
+                loading.classList.add('hidden');
+
+                if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+                    errorEl.textContent = 'Шаблоны пока не добавлены';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                Object.entries(data).forEach(([name, tpl]) => {
+                    if (!tpl || typeof tpl !== 'object') return;
+
+                    const card = document.createElement('div');
+                    card.className = 'template-card';
+
+                    const previewUrl = (tpl.preview && tpl.preview !== 'null') ? tpl.preview : '';
+                    const avatarUrl  = (tpl.avatar && tpl.avatar !== 'null') ? tpl.avatar : '';
+                    const author     = (tpl.author && tpl.author !== 'null') ? tpl.author : 'Unknown';
+
+                    if (previewUrl) {
+                        const img = document.createElement('img');
+                        img.className = 'template-preview';
+                        img.src = previewUrl;
+                        img.alt = name;
+                        img.onerror = () => {
+                            const ph = document.createElement('div');
+                            ph.className = 'template-preview-placeholder';
+                            ph.textContent = 'Нет превью';
+                            img.replaceWith(ph);
+                        };
+                        card.appendChild(img);
+                    } else {
+                        const ph = document.createElement('div');
+                        ph.className = 'template-preview-placeholder';
+                        ph.textContent = 'Нет превью';
+                        card.appendChild(ph);
+                    }
+
+                    const info = document.createElement('div');
+                    info.className = 'template-info';
+
+                    if (avatarUrl) {
+                        const av = document.createElement('img');
+                        av.className = 'template-avatar';
+                        av.src = avatarUrl;
+                        av.alt = author;
+                        av.onerror = () => { av.style.visibility = 'hidden'; };
+                        info.appendChild(av);
+                    } else {
+                        const av = document.createElement('div');
+                        av.className = 'template-avatar';
+                        info.appendChild(av);
+                    }
+
+                    const meta = document.createElement('div');
+                    meta.className = 'template-meta';
+                    meta.innerHTML = `
+                        <div class="template-name" title="${escapeHtml(name)}">${escapeHtml(name)}</div>
+                        <div class="template-author" title="${escapeHtml(author)}">by ${escapeHtml(author)}</div>
+                    `;
+                    info.appendChild(meta);
+                    card.appendChild(info);
+
+                    const btn = document.createElement('button');
+                    btn.className = 'template-apply-btn';
+                    btn.textContent = 'Применить';
+                    btn.onclick = () => applyTemplate(name, tpl);
+                    card.appendChild(btn);
+
+                    grid.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error('Templates load error:', err);
+                loading.classList.add('hidden');
+                errorEl.textContent = 'Ошибка загрузки шаблонов';
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        async function applyTemplate(templateName, tpl) {
+            const user = localStorage.getItem('currentUser');
+            if (!user) {
+                alert('Сессия истекла, войдите заново');
+                return;
+            }
+
+            if (!confirm(`Применить шаблон "${templateName}"? Аватар и баннер будут обновлены в вашем профиле.`)) return;
+
+            const bannerVal = (tpl.banner && tpl.banner !== 'null') ? tpl.banner : null;
+            const avatarVal = (tpl.avatar && tpl.avatar !== 'null') ? tpl.avatar : null;
+
+            if (!avatarVal && !bannerVal) {
+                alert('В этом шаблоне нет аватара и баннера');
+                return;
+            }
+
+            try {
+                const currentRes = await fetch(`${DB_URL}/${user}.json`);
+                const currentData = (await currentRes.json()) || {};
+
+                const updated = {
+                    ...currentData,
+                    avatar: avatarVal !== null ? avatarVal : (currentData.avatar ?? 'null'),
+                    banner: bannerVal !== null ? bannerVal : (currentData.banner ?? 'null')
+                };
+
+                const saveRes = await fetch(`${DB_URL}/${user}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updated)
+                });
+
+                if (!saveRes.ok) {
+                    alert('Не удалось сохранить шаблон в профиль');
+                    return;
+                }
+
+                if (bannerVal) document.getElementById('input-banner').value = bannerVal;
+                if (avatarVal) {
+                    document.getElementById('input-avatar').value = avatarVal;
+                    document.getElementById('sidebar-avatar').src = avatarVal;
+                }
+
+                const mainBtn = document.querySelector('.nav-item');
+                if (mainBtn) switchTab('main', { currentTarget: mainBtn });
+
+                const statusEl = document.getElementById('save-status');
+                if (statusEl) {
+                    statusEl.textContent = `Шаблон "${templateName}" применён`;
+                    statusEl.style.color = '#6bffa0';
+                    setTimeout(() => { statusEl.textContent = ''; }, 3000);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Ошибка сети при применении шаблона');
+            }
+        }
+
+        // ===== DAILY LIMIT =====
+        function todayKey() {
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        async function getDailyUsage(user) {
+            try {
+                const res = await fetch(`${DB_URL}/template_limits/${user}.json`);
+                const data = await res.json();
+                if (!data) return { date: todayKey(), count: 0 };
+                if (data.date !== todayKey()) return { date: todayKey(), count: 0 };
+                return { date: data.date, count: Number(data.count) || 0 };
+            } catch (e) {
+                return { date: todayKey(), count: 0 };
+            }
+        }
+
+        async function refreshDailyCounter() {
+            const user = localStorage.getItem('currentUser');
+            const counterEl = document.getElementById('daily-counter');
+            const createBtn = document.getElementById('create-tpl-btn');
+            if (!user || !counterEl) return;
+
+            const usage = await getDailyUsage(user);
+            const left = Math.max(0, DAILY_TEMPLATE_LIMIT - usage.count);
+
+            counterEl.textContent = `Сегодня: ${usage.count}/${DAILY_TEMPLATE_LIMIT} (осталось ${left})`;
+
+            if (left <= 0) {
+                createBtn.disabled = true;
+                createBtn.textContent = 'Лимит на сегодня';
+            } else {
+                createBtn.disabled = false;
+                createBtn.textContent = '+ Создать шаблон';
+            }
+        }
+
+        // ===== CREATE TEMPLATE MODAL =====
+        function openCreateTemplateModal() {
+            const user = localStorage.getItem('currentUser');
+            if (!user) {
+                alert('Сессия истекла, войдите заново');
+                return;
+            }
+
+            document.getElementById('create-tpl-error').classList.add('hidden');
+            document.getElementById('create-tpl-success').classList.add('hidden');
+            document.getElementById('tpl-name').value = '';
+            ['avatar', 'banner', 'preview'].forEach(f => {
+                document.getElementById(`tpl-${f}`).value = '';
+                const box = document.getElementById(`tpl-preview-${f}`);
+                box.style.display = 'none';
+                box.querySelector('img').src = '';
+            });
+            document.getElementById('tpl-author-name').textContent = user;
+            document.getElementById('create-tpl-modal').classList.remove('hidden');
+        }
+
+        function closeCreateTemplateModal() {
+            document.getElementById('create-tpl-modal').classList.add('hidden');
+        }
+
+        function previewTplImage(field, url) {
+            const box = document.getElementById(`tpl-preview-${field}`);
+            const img = box.querySelector('img');
+            if (url && /^https?:\/\//i.test(url)) {
+                img.src = url;
+                box.style.display = 'block';
+            } else {
+                img.src = '';
+                box.style.display = 'none';
+            }
+        }
+
+        async function uploadTemplateImage(fieldType, fileInput) {
+            if (!fileInput.files || fileInput.files.length === 0) return;
+            const file = fileInput.files[0];
+            const loadingEl = document.getElementById(`tpl-loading-${fieldType}`);
+            loadingEl.classList.remove('hidden');
+
+            const apiKey = imgbbKeys[Math.floor(Math.random() * imgbbKeys.length)];
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (result.success) {
+                    document.getElementById(`tpl-${fieldType}`).value = result.data.url;
+                    previewTplImage(fieldType, result.data.url);
+                } else {
+                    showCreateTplError('Ошибка загрузки: ' + (result.error?.message || 'Неизвестная ошибка'));
+                }
+            } catch (err) {
+                console.error(err);
+                showCreateTplError('Ошибка сети при загрузке изображения');
+            } finally {
+                loadingEl.classList.add('hidden');
+                fileInput.value = '';
+            }
+        }
+
+        function showCreateTplError(msg) {
+            const el = document.getElementById('create-tpl-error');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+            document.getElementById('create-tpl-success').classList.add('hidden');
+        }
+
+        function showCreateTplSuccess(msg) {
+            const el = document.getElementById('create-tpl-success');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+            document.getElementById('create-tpl-error').classList.add('hidden');
+        }
+
+        async function submitTemplate() {
+            const user = localStorage.getItem('currentUser');
+            if (!user) {
+                showCreateTplError('Сессия истекла');
+                return;
+            }
+
+            const name = document.getElementById('tpl-name').value.trim();
+            const avatar = document.getElementById('tpl-avatar').value.trim();
+            const banner = document.getElementById('tpl-banner').value.trim();
+            const preview = document.getElementById('tpl-preview').value.trim();
+
+            if (!name) {
+                showCreateTplError('Введите название шаблона');
+                return;
+            }
+            if (!avatar || !banner || !preview) {
+                showCreateTplError('Заполните аватар, баннер и превью');
+                return;
+            }
+            if (/[.#$\[\]\/]/.test(name)) {
+                showCreateTplError('Название не должно содержать . # $ [ ] /');
+                return;
+            }
+
+            const submitBtn = document.getElementById('tpl-submit-btn');
+            submitBtn.disabled = true;
+
+            try {
+                const usage = await getDailyUsage(user);
+                if (usage.count >= DAILY_TEMPLATE_LIMIT) {
+                    showCreateTplError(`Лимит ${DAILY_TEMPLATE_LIMIT} шаблонов в день исчерпан. Попробуйте завтра.`);
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                const checkRes = await fetch(`${DB_URL}/templates/${encodeURIComponent(name)}.json`);
+                const exists = await checkRes.json();
+                if (exists) {
+                    showCreateTplError('Шаблон с таким названием уже существует');
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                const payload = {
+                    avatar,
+                    banner,
+                    preview,
+                    author: user,
+                    createdAt: Date.now()
+                };
+
+                const saveRes = await fetch(`${DB_URL}/templates/${encodeURIComponent(name)}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!saveRes.ok) {
+                    showCreateTplError('Не удалось сохранить шаблон');
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                const newCount = usage.count + 1;
+                await fetch(`${DB_URL}/template_limits/${user}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date: todayKey(), count: newCount })
+                });
+
+                showCreateTplSuccess(`Шаблон "${name}" создан!`);
+
+                await loadTemplates();
+                await refreshDailyCounter();
+
+                setTimeout(() => {
+                    closeCreateTemplateModal();
+                }, 1200);
+
+            } catch (err) {
+                console.error(err);
+                showCreateTplError('Ошибка сети при создании шаблона');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        checkSession();
+    </script>
+</body>
+</html>

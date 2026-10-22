@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True Crime // Shop</title>
+    <style>
+        :root {
+            --accent-color: #E07B39;
+            --accent-green: #6bffa0;
+            --bg-glass: rgba(16, 14, 18, 0.88);
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #0b0b0e;
+            background-image: url('https://i.pinimg.com/1200x/cc/2c/4a/cc2c4a8710bbab5892b3ccdd64719332.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #fff;
+            padding: 24px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 6, 12, 0.72);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shop-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 960px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--bg-glass);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 14px 6px 8px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #2a2a2a;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .profile-username {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .balance-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(107, 255, 160, 0.08);
+            border: 1px solid rgba(107, 255, 160, 0.2);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .topup-btn {
+            background: var(--accent-color);
+            color: #14100c;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .topup-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Main Section */
+        .main-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .section-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        /* Grid */
+        .decor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .decor-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .decor-card:hover {
+            border-color: rgba(224, 123, 57, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .decor-preview-box {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .decor-sample-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #2a2a2a;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .decor-frame-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            object-fit: contain;
+            z-index: 2;
+        }
+
+        .decor-frame-overlay[data-decor="Cat!"] { width: 150%; height: 150%; }
+        .decor-frame-overlay[data-decor="Вороны"] { width: 181%; height: 181%; }
+        .decor-frame-overlay[data-decor="Кресты"] { width: 186%; height: 186%; }
+        .decor-frame-overlay[data-decor="Venom"] { width: 142%; height: 142%; top: 41%; }
+
+        .decor-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .decor-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 16px;
+        }
+
+        .decor-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: auto;
+            gap: 8px;
+        }
+
+        .price-badge {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+
+        .buy-btn {
+            padding: 8px 14px;
+            background: var(--accent-color);
+            color: #14100c;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .buy-btn:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .buy-btn:disabled {
+            background: rgba(107, 255, 160, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(107, 255, 160, 0.3);
+            cursor: default;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: #141218;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-icon {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .modal-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.65);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--accent-color);
+            color: #14100c;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shop-container">
+        <!-- Top Navigation & User Info -->
+        <div class="top-bar">
+            <div class="logo">TRUE<span>CRIME</span> // SHOP</div>
+
+            <div class="user-section">
+                <div class="profile-card">
+                    <img id="user-avatar" class="profile-avatar" src="" alt="Avatar">
+                    <span id="user-name" class="profile-username">Загрузка...</span>
+                </div>
+
+                <div class="balance-card">
+                    💵 <span id="user-balance">$0.00</span>
+                </div>
+
+                <button class="topup-btn" onclick="openTopUpModal()">+ Пополнить</button>
+                <a href="../dashboard/index.html" class="nav-btn">Дашборд</a>
+            </div>
+        </div>
+
+        <!-- Main Content Panel -->
+        <div class="main-panel">
+            <div class="section-header">
+                <h1 class="section-title">Украшения аватарок (Рамки)</h1>
+                <p class="section-subtitle">Приобретайте уникальные рамки для вашего профиля. Купленные рамки сразу становятся доступны в Дашборде!</p>
+            </div>
+
+            <div class="decor-grid" id="decor-grid">
+                <!-- Cards will be populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Top Up Info -->
+    <div class="modal-overlay hidden" id="topup-modal">
+        <div class="modal-box">
+            <div class="modal-icon">💳</div>
+            <div class="modal-title">Пополнение баланса</div>
+            <div class="modal-text">
+                Автоматическое пополнение временно находится на техобслуживании.<br><br>
+                Для пополнения баланса обратитесь напрямую к администратору.
+            </div>
+            <button class="modal-btn" onclick="closeTopUpModal()">Понятно</button>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="modal-overlay hidden" id="alert-modal">
+        <div class="modal-box">
+            <div class="modal-icon" id="alert-icon">ℹ️</div>
+            <div class="modal-title" id="alert-title">Уведомление</div>
+            <div class="modal-text" id="alert-text"></div>
+            <button class="modal-btn" onclick="closeAlertModal()">ОК</button>
+        </div>
+    </div>
+
+    <script>
+        const DB_URL = 'https://fireguild-cb569-default-rtdb.firebaseio.com';
+
+        const ITEM_PRICE = 2.00; // Each frame costs $2
+
+        const shopDecors = [
+            { name: 'Cat!', title: 'Рамка "Cat!"', image: '../bin/decor/cat-Photoroom.png' },
+            { name: 'Venom', title: 'Рамка "Venom"', image: '../bin/decor/venom-Photoroom.png' },
+            { name: 'Вороны', title: 'Рамка "Вороны"', image: '../bin/decor/voroni-Photoroom.png' },
+            { name: 'Кресты', title: 'Рамка "Кресты"', image: '../bin/decor/krest-Photoroom.png' }
+        ];
+
+        let currentUser = null;
+        let userBalance = 0.00;
+        let userDecors = {};
+        let userAvatarUrl = '';
+
+        function getCurrentUser() {
+            let user = localStorage.getItem('currentUser');
+            if (!user) {
+                const match = document.cookie.match(/(?:^|; )currentUser=([^;]*)/);
+                if (match) user = decodeURIComponent(match[1]);
+            }
+            return user;
+        }
+
+        function showAlert(text, title = 'Уведомление', icon = 'ℹ️') {
+            document.getElementById('alert-title').textContent = title;
+            document.getElementById('alert-text').textContent = text;
+            document.getElementById('alert-icon').textContent = icon;
+            document.getElementById('alert-modal').classList.remove('hidden');
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alert-modal').classList.add('hidden');
+        }
+
+        function openTopUpModal() {
+            document.getElementById('topup-modal').classList.remove('hidden');
+        }
+
+        function closeTopUpModal() {
+            document.getElementById('topup-modal').classList.add('hidden');
+        }
+
+        function renderShopGrid() {
+            const grid = document.getElementById('decor-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            shopDecors.forEach(item => {
+                const isOwned = userDecors && (userDecors[item.name] === true || userDecors[item.name] === "true");
+                const card = document.createElement('div');
+                card.className = 'decor-card';
+
+                const avatarSrc = userAvatarUrl || 'https://via.placeholder.com/80';
+
+                card.innerHTML = `
+                    <div class="decor-preview-box">
+                        <img class="decor-sample-avatar" src="${avatarSrc}" alt="Avatar">
+                        <img class="decor-frame-overlay" src="${item.image}" data-decor="${item.name}" alt="${item.title}">
+                    </div>
+                    <div class="decor-title">${item.title}</div>
+                    <div class="decor-desc">Украшение для вашей аватарки</div>
+                    <div class="decor-price-row">
+                        <div class="price-badge">$${ITEM_PRICE.toFixed(2)}</div>
+                        ${isOwned
+                            ? `<button class="buy-btn" disabled>✔ Куплено</button>`
+                            : `<button class="buy-btn" onclick="buyDecor('${item.name}')">Купить</button>`
+                        }
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function initShop() {
+            currentUser = getCurrentUser();
+
+            if (!currentUser) {
+                window.location.href = '../dashboard/index.html';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${DB_URL}/${currentUser}.json`);
+                const data = await res.json();
+
+                if (!data) {
+                    window.location.href = '../dashboard/index.html';
+                    return;
+                }
+
+                const nickname = (data.nickname && data.nickname !== 'null' && data.nickname.trim() !== '') ? data.nickname : currentUser;
+                userAvatarUrl = (data.avatar && data.avatar !== 'null') ? data.avatar : '';
+                userBalance = (data.balance !== undefined && data.balance !== null && data.balance !== 'null') ? parseFloat(data.balance) : 0.00;
+                if (isNaN(userBalance)) userBalance = 0.00;
+
+                userDecors = (data.decors && typeof data.decors === 'object') ? data.decors : {};
+
+                document.getElementById('user-name').textContent = nickname;
+                document.getElementById('user-balance').textContent = `$${userBalance.toFixed(2)}`;
+
+                const avatarImg = document.getElementById('user-avatar');
+                if (userAvatarUrl) {
+                    avatarImg.src = userAvatarUrl;
+                } else {
+                    avatarImg.src = 'https://via.placeholder.com/32';
+                }
+
+                renderShopGrid();
+
+            } catch (e) {
+                console.error('Ошибка инициализации магазина:', e);
+                window.location.href = '../dashboard/index.html';
+            }
+        }
+
+        async function buyDecor(decorName) {
+            if (!currentUser) return;
+
+            const isOwned = userDecors && (userDecors[decorName] === true || userDecors[decorName] === "true");
+            if (isOwned) {
+                showAlert('У вас уже куплена эта рамка!', 'Внимание', '⚠️');
+                return;
+            }
+
+            if (userBalance < ITEM_PRICE) {
+                showAlert(`Недостаточно средств на балансе!\n\nВаш баланс: $${userBalance.toFixed(2)}\nЦена: $${ITEM_PRICE.toFixed(2)}\n\nПополните счет для покупки.`, 'Недостаточно средств', '❌');
+                return;
+            }
+
+            try {
+                const newBalance = userBalance - ITEM_PRICE;
+                userDecors[decorName] = true;
+
+                await fetch(`${DB_URL}/${currentUser}.json`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        balance: newBalance,
+                        decors: userDecors
+                    })
+                });
+
+                userBalance = newBalance;
+                document.getElementById('user-balance').textContent = `$${userBalance.toFixed(2)}`;
+
+                showAlert(`Поздравляем! Вы купили рамку "${decorName}".\n\nОна стала доступна в вашем Дашборде!`, 'Успешная покупка!', '🎉');
+                renderShopGrid();
+
+            } catch (e) {
+                console.error(e);
+                showAlert('Ошибка сети при покупке. Попробуйте позже.', 'Ошибка', '❌');
+            }
+        }
+
+        initShop();
+    </script>
+</body>
+</html>
